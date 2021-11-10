@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <sys/types.h>
 
+//COMMANDS
 #define A 0x03
 #define F 0x7e
 #define SET 0x03
@@ -10,7 +11,9 @@
 #define REJ 0x01
 #define CMDSZ 5 //[FLAG,ADDRESS,CMD,BCC,FLAG]
 
-int dataIsViable(u_int8_t mes[], int size)
+
+
+int dataIsViable(char mes[], int size)
 {
     {
         char sum = 0;
@@ -22,7 +25,7 @@ int dataIsViable(u_int8_t mes[], int size)
     }
 }
 
-void printCommand(u_int8_t buf[])
+void printCommand(char buf[])
 {
     printf("Command:");
     for (int i = 0; i < CMDSZ; i++)
@@ -32,32 +35,32 @@ void printCommand(u_int8_t buf[])
     printf("\n");
 }
 
-void commandMessage(u_int8_t buf[], char C)
+void commandMessage(char buf[], char C)
 {
     snprintf(buf, 6, "%c%c%c%c%c", F, A, C, A ^ C, F); // does this put the end of line character in the buffer too?
 }
 
-void SETMessage(u_int8_t buf[])
+void SETMessage(char buf[])
 {
     commandMessage(buf, SET);
 }
 
-void DISCMessage(u_int8_t buf[])
+void DISCMessage(char buf[])
 {
     commandMessage(buf, DISC);
 }
 
-void UAMessage(u_int8_t buf[])
+void UAMessage(char buf[])
 {
     commandMessage(buf, UA);
 }
 
-void RRMessage(u_int8_t buf[], int R)
+void RRMessage(char buf[], int R)
 {
     commandMessage(buf, RR | (R << 7));
 }
 
-void REJMessage(u_int8_t buf[], int R)
+void REJMessage(char buf[], int R)
 {
     commandMessage(buf, REJ | (R << 7));
 }

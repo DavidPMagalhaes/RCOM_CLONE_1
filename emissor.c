@@ -21,8 +21,8 @@ volatile int STOP = FALSE;
 int main(int argc, char **argv)
 {
   int res, fd;
-  u_int8_t buf[255];
-  u_int8_t mes[255];
+  char buf[255];
+  char mes[255];
   struct termios oldtio, newtio;
   fd = setFD(argc, argv, &oldtio, &newtio);
 

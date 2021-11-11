@@ -3,20 +3,20 @@
 
 void stuff(struct frame *frame, char tostuff[], int tostuffSize)
 {
-    if (frame->stuffFrameSize == 0)
+    if (frame->stuffedFrameSize == 0)
     {
         initializeFrame(frame); //Makes size of the stuffed frame to be MAX_SIZE
     }
     int sfCount = FIRST_DATA_INDEX; //stuffed count
     int nsfCount = 0;               //nonstuffed count
     int flagged = 0;
-    char c;
+    char c, protectionByte = 0;
 
     for (int i = 0; i < tostuffSize; i++)
     {
 
         //Gets 20 more bytes of space in the stuffedFrame
-        if (sfCount == frame->stuffFrameSize - 2) //-2 because that's the maximum amount of space that we will add in an iteration
+        if (sfCount == frame->stuffedFrameSize - 2) //-2 because that's the maximum amount of space that we will add in an iteration
         {
             allocSpace(frame, SPACE_ALLOC_SIZE);
         }
@@ -44,7 +44,7 @@ void stuff(struct frame *frame, char tostuff[], int tostuffSize)
 
     if (protectionByte == F) //Special and rare case
     {
-        if (sfCount + 3 > frame->stuffFrameSize) // the previous operation filled the buffer
+        if (sfCount + 3 > frame->stuffedFrameSize) // the previous operation filled the buffer
         {
             allocSpace(frame, 3);
         }
@@ -57,7 +57,7 @@ void stuff(struct frame *frame, char tostuff[], int tostuffSize)
     }
     else
     {
-        if (sfCount + 2 > frame->stuffFrameSize) // the previous operation filled the buffer
+        if (sfCount + 2 > frame->stuffedFrameSize) // the previous operation filled the buffer
         {
             allocSpace(frame, 2);
         }
@@ -74,7 +74,7 @@ void destuff(struct frame *frame, char *buffer, int bufferCapacity, int *bufferL
     //Previous functions should have checked the first protection byte
     //We will only check the second
 
-    if (frame->stuffFrameSize == 0)
+    if (frame->stuffedFrameSize == 0)
     {
         initializeFrame(frame);
     }
@@ -134,11 +134,11 @@ void destuff(struct frame *frame, char *buffer, int bufferCapacity, int *bufferL
 
 void allocSpace(struct frame *frame, int space)
 {
-    char *newFrame = (char *)malloc(frame->stuffFrameSize + space);
-    memcpy((void *)newFrame, (void *)frame->stuffedFrame, frame->stuffFrameSize);
+    char *newFrame = (char *)malloc(frame->stuffedFrameSize + space);
+    memcpy((void *)newFrame, (void *)frame->stuffedFrame, frame->stuffedFrameSize);
     free(frame->stuffedFrame);
     frame->stuffedFrame = newFrame;
-    frame->stuffFrameSize += space;
+    frame->stuffedFrameSize += space;
 }
 
 int allocBufferSpace(char *buffer, int prevSpace, int extraSpace)

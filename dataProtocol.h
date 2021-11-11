@@ -12,9 +12,9 @@ typedef enum
 struct frame
 {
     char frame[MAX_SIZE]; /*Trama*/
-    int frameSize = MAX_SIZE;
+    int frameSize;
     char *stuffedFrame;
-    int stuffedFrameSize = 0;
+    int stuffedFrameSize;
 };
 
 struct linkLayer
@@ -27,6 +27,7 @@ struct linkLayer
     unsigned int numTransmissions; /*Número de tentativas em caso de
 falha*/
     struct frame frame;
+    linkType type;
 };
 
 void initializeFrame(struct frame *frame);

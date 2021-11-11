@@ -1,2 +1,12 @@
-build: main.c dataProtocol.c byteStuffing.c
-	gcc -o dataLayer.exe main.c dataProtocol.c byteStuffing.c
+build: main.c application.c application.h dataProtocol.c dataProtocol.h setFD.c setFD.h commandMessages.c commandMessages.h physicalProtocol.c physicalProtocol.h transmitter.c transmitter.h receiver.c receiver.h byteStuffing.c byteStuffing.h
+	gcc -o main.exe main.c application.c dataProtocol.c setFD.c commandMessages.c physicalProtocol.c transmitter.c receiver.c byteStuffing.c
+
+ports:
+	sudo socat -d  -d  PTY,link=/dev/ttyS10,mode=777   PTY,link=/dev/ttyS11,mode=777
+
+run: receiver transmitter
+
+receiver:
+	./main.exe 1
+transmitter:
+	./main.exe 2

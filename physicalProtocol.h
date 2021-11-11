@@ -11,10 +11,14 @@ typedef enum
     C_RCV,
     BCC_OK,
     STOP
-} writeCommandState;
+} commandState;
+
+void writeLinkResponse(struct linkLayer *link);
 
 int writeLinkCommand(struct linkLayer *link, char A, char C);
 
-int writeCommandStateMachine(writeCommandState state, char A, char C, char byte);
+int readLinkCommand(struct linkLayer *link, char A, char C);
+
+int commandStateMachine(commandState state, char A, char C, char byte);
 
 #endif

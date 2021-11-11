@@ -12,9 +12,9 @@
 
 //Stuffing and destuffing already take care of the protection byte
 
-void stuff(struct frame *frame, char tostuff[], int tostuffSize, char protectionByte)
+int stuff(struct frame *frame, char tostuff[], int tostuffSize); //,char protectionByte); ??
 
-void destuff(struct frame *frame, char *buffer, int bufferCapacity, int *bufferLength);
+int destuff(struct frame *frame, char *buffer, int bufferCapacity, int *bufferLength);
 
 void allocSpace(struct frame *frame, int space);
 

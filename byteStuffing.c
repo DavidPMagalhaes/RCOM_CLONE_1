@@ -1,7 +1,10 @@
-#include "commandMessages.h"
 #include "byteStuffing.h"
 
-void stuff(struct frame *frame, char tostuff[], int tostuffSize)
+#include <stdlib.h>
+#include <string.h>
+#include "commandMessages.h"
+
+int stuff(struct frame *frame, char tostuff[], int tostuffSize)
 {
     if (frame->stuffedFrameSize == 0)
     {
@@ -66,10 +69,10 @@ void stuff(struct frame *frame, char tostuff[], int tostuffSize)
         frame->stuffedFrame[sfCount] = F;
         sfCount++;
     }
-    return;
+    return 0;
 }
 
-void destuff(struct frame *frame, char *buffer, int bufferCapacity, int *bufferLength)
+int destuff(struct frame *frame, char *buffer, int bufferCapacity, int *bufferLength)
 {
     //Previous functions should have checked the first protection byte
     //We will only check the second
@@ -146,7 +149,7 @@ int allocBufferSpace(char *buffer, int prevSpace, int extraSpace)
     int totalSpace = prevSpace + extraSpace;
     char *newBuf = (char *)malloc(totalSpace);
     memcpy(newBuf, buffer, prevSpace);
-    free(frame->buffer);
+    free(buffer);
     buffer = newBuf;
     return totalSpace;
 }

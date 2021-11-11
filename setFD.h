@@ -1,33 +1,29 @@
+#ifndef SETFD_H
+#define SETFD_H
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <termios.h>
 #include <stdio.h>
 
+#include "dataProtocol.h"
+
 #define BAUDRATE B38400
 #define _POSIX_SOURCE 1 /* POSIX compliant source */
 #define FALSE 0
 #define TRUE 1
 
-int setFD(int argc, char **argv, struct termios *oldtio, struct termios *newtio)
+int setFD(struct linkLayer *link, struct termios *oldtio, struct termios *newtio)
 {
 
   int fd;
-
-  if ((argc < 2) ||
-      ((strcmp("/dev/ttyS10", argv[1]) != 0) &&
-       (strcmp("/dev/ttyS11", argv[1]) != 0)))
-  {
-    printf("Usage:\tnserial SerialPort\n\tex: nserial /dev/ttyS1\n");
-    exit(1);
-  }
-
   /*
     Open serial port device for reading and writing and not as controlling tty
     because we don't want to get killed if linenoise sends CTRL-C.
   */
 
-  fd = open(argv[1], O_RDWR | O_NOCTTY);
+  fd = open(link->port, O_RDWR | O_NOCTTY);
 
   // Makes the fd nonblocking. We'd rather achieve that by another method since this will make
   // the read to throw error 11: Resource temporarily unavailable
@@ -35,7 +31,7 @@ int setFD(int argc, char **argv, struct termios *oldtio, struct termios *newtio)
 
   if (fd < 0)
   {
-    perror(argv[1]);
+    perror(link->port);
     exit(-1);
   }
 
@@ -72,7 +68,7 @@ int setFD(int argc, char **argv, struct termios *oldtio, struct termios *newtio)
 
   printf("New termios structure set\n");
 
-  return fd;
+  link->fd = fd;
 }
 
 restoreFD(int fd, struct termios oldtio)
@@ -85,3 +81,5 @@ restoreFD(int fd, struct termios oldtio)
 
   close(fd);
 }
+
+#endif

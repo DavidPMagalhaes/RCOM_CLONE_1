@@ -1,4 +1,10 @@
+#include <termios.h>
+
 #include "dataProtocol.h"
+#include "setFD.h"
+
+struct termios oldtio, newtio;
+struct linkLayer link;
 
 void initializeFrame(struct frame *frame)
 {
@@ -7,30 +13,38 @@ void initializeFrame(struct frame *frame)
     frame->stuffedFrameSize = MAX_SIZE;
 }
 
-int llopen(int porta, int soup){
-    char* porta2 = malloc(sizeof(char) * (strlen(COM) + 1);
-    sprintf(porta2,%s%d,COM,porta);
-    int fd = setfd(porta);
-    switch(type) {
-        case SENDER:
-            if (senderSomething(fd) > 0) return fd; //emissor.c
-        case RECEiVER:
-            if (receiverSomething(fd) > 0) return fd; //recetor.c
-            
+int llopen(int porta, linkType type)
+{
+    sprintf(link.port, "/dev/ttyS%d", porta);
+    setFD(&link, &oldtio, &newtio);
+    initializeFrame(&link.frame);
+    switch (type)
+    {
+    case TRANSMITTER:
+        if (openTransmitter(link) == 0)
+        {
+            return link.fd; //emissor.c
+        }
+    case RECEIVER:
+    int fd;
+        if (receiverSomething(fd) > 0)
+        {
+            return fd; //recetor.c
+        }
     }
     return -1;
 }
 
-void llwrite(){
-
+int llwrite(int fd, char *buffer, int length)
+{
 }
 
-void llread(){
-
+int llread(int fd, char *buffer)
+{
 }
 
-int llclose(int fd){
-    
+int llclose(int fd)
+{
 
     return -1;
 }

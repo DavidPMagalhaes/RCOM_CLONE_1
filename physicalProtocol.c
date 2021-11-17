@@ -88,7 +88,7 @@ int writeLinkCommand(struct linkLayer *link, char A, char C)
 int writeLinkInformation(struct linkLayer *link, char A)
 {
     printf("writing link command");
-    int res, Nr;
+    int res, Nr = 0;
     struct frame frame = link->frame;
     char byte;
     flag = 1;
@@ -294,6 +294,7 @@ int commandStateMachine(commandState state, char A, char C, char byte)
 
 int writeInformationStateMachine(writeInformationState state, char A, char byte, int *Nr)
 {
+    u_int8_t b;
     static int protectionByte = 0;
     switch (state)
     {
@@ -312,14 +313,15 @@ int writeInformationStateMachine(writeInformationState state, char A, char byte,
         }
         return WI_START;
     case WI_A_RCV:
-        (*Nr) = byte >> 7;
+        b = (u_int8_t)byte;
+        (*Nr) = b >> 7;
 
         protectionByte ^= byte;
-        if (byte == REJ || byte == REJ_N1)
+        if (b == REJ || b == REJ_N1)
         {
             return WI_REJ_RCV;
         }
-        else if (byte == RR || byte == RR_N1)
+        else if (b == RR || b == RR_N1)
         {
             return WI_RR_RCV;
         }
@@ -377,6 +379,7 @@ int readInformationStateMachine(readInformationState state, char A, char byte, i
         return RI_RESET;
     case RI_A_RCV:
         protectionByte ^= byte;
+        // Might be a error here because byte is not a u_int8_t and stuff happens
         if (byte == 0 || byte == (1 << 6))
         {
             return RI_INF;

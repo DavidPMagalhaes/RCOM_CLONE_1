@@ -11,10 +11,9 @@ typedef enum
 
 struct frame
 {
-    char frame[MAX_SIZE]; /*Trama*/
-    int frameSize;
-    char *stuffedFrame;
-    int stuffedFrameSize;
+    char frame[MAX_SIZE*2 + 5 + 2]; // Trama
+    // MAX_SIZE is maximum data size. *2 due to the stsuffing. 5 for the commands, 2 for the date proction byte that might need stuffing as well
+    int frameUsedSize;
 };
 
 struct linkLayer
@@ -30,7 +29,7 @@ falha*/
     linkType type;
 };
 
-void initializeFrame(struct frame *frame);
+// void initializeFrame(struct frame *frame);
 
 int llopen(int porta, linkType type);
 

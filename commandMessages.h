@@ -12,7 +12,9 @@
 #define DISC 0x0B
 #define UA 0x07
 #define RR 0x05
+#define RR_N1 0x85
 #define REJ 0x01
+#define REJ_N1 0x81
 #define CMDSZ 5 //[FLAG,ADDRESS,CMD,BCC,FLAG]
 
 int dataIsViable(char mes[], int size);
@@ -33,4 +35,5 @@ void RRMessage(char buf[], int R);
 
 void REJMessage(char buf[], int R);
 
+void IMessage (char buf[], int S);
 #endif

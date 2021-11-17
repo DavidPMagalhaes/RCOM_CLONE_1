@@ -61,3 +61,8 @@ void REJMessage(char buf[], int R)
 {
     commandMessage(buf, A_EM, REJ | (R << 7));
 }
+
+void IMessage(char buf[], int S){
+    u_int8_t C = S << 6; // Does this work?
+    snprintf(buf, 5, "%c%c%c%c", F, A_EM, C, A_EM ^ C);
+}

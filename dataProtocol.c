@@ -10,19 +10,20 @@
 struct termios oldtio, newtio;
 struct linkLayer link;
 
-void initializeFrame(struct frame *frame)
-{
-    printf("initializing frame inside");
-    fflush(stdout);
-    char *newFrame = (char *)malloc(MAX_SIZE);
-    printf("mem alloc");
-    fflush(stdout);
-    frame->frameSize = MAX_SIZE;
-    frame->stuffedFrame = newFrame;
-    frame->stuffedFrameSize = MAX_SIZE;
-    printf("done alloc");
-    fflush(stdout);
-}
+// void initializeFrame(struct frame *frame)
+// {
+//     printf("initializing frame inside");
+//     fflush(stdout);
+//     char *newFrame = (char *)malloc(MAX_SIZE);
+//     printf("mem alloc");
+//     fflush(stdout);
+//     frame->frameSize = MAX_SIZE;
+//     frame->stuffedFrame = newFrame;
+//     frame->stuffedFrameSize = MAX_SIZE;
+//     frame->stuffedFrameUsedSize = 0;
+//     printf("done alloc");
+//     fflush(stdout);
+// }
 
 int llopen(int porta, linkType type)
 {
@@ -30,11 +31,14 @@ int llopen(int porta, linkType type)
     setFD(&link, &oldtio, &newtio);
     printf("set fd");
     fflush(stdout);
-    initializeFrame(&link.frame);
+    // initializeFrame(&link.frame);
     printf("initialing frame");
     fflush(stdout);
 
     link.type = type;
+    link.sequenceNumber = 0;
+    link.timeout = 3;
+    link.numTransmissions =3;
     switch (type)
     {
     case TRANSMITTER:
@@ -50,7 +54,7 @@ int llopen(int porta, linkType type)
         printf("attempting to open receiver");
         fflush(stdout);
 
-        if (openReceiver(&link) > 0)
+        if (openReceiver(&link) == 0)
         {
             return link.fd; //recetor.c
         }
@@ -61,10 +65,18 @@ int llopen(int porta, linkType type)
 
 int llwrite(int fd, char *buffer, int length)
 {
+    if(fd != link.fd){
+        // do something
+    }
+    return writeTransmitter(&link, buffer, length);
 }
 
 int llread(int fd, char *buffer)
 {
+    if(fd != link.fd){
+        // do something
+    }
+    return readReceiver(&link, buffer);
 }
 
 int llclose(int fd)
@@ -73,10 +85,12 @@ int llclose(int fd)
     switch (link.type)
     {
     case TRANSMITTER:
+    printf("closing transmitter\n");
         res = closeTransmitter(&link);
         break;
     case RECEIVER:
-        res = closeReceiver(&link);
+        // We don't do anything and just close the fd
+        // res = closeReceiver(&link);
         break;
     }
     if (res != 0)

@@ -4,12 +4,78 @@
 #include <string.h>
 #include "commandMessages.h"
 
+// int stuff(struct frame *frame, char tostuff[], int tostuffSize)
+// {
+//     if (frame->stuffedFrameSize == 0)
+//     {
+//         initializeFrame(frame); //Makes size of the stuffed frame to be MAX_SIZE
+//     }
+//     int sfCount = FIRST_DATA_INDEX; //stuffed count
+//     int nsfCount = 0;               //nonstuffed count
+//     int flagged = 0;
+//     char c, protectionByte = 0;
+
+//     for (int i = 0; i < tostuffSize; i++)
+//     {
+
+//         //Gets 20 more bytes of space in the frame
+//         if (sfCount == frame->stuffedFrameSize - 2) //-2 because that's the maximum amount of space that we will add in an iteration
+//         {
+//             allocSpace(frame, SPACE_ALLOC_SIZE);
+//         }
+
+//         c = tostuff[i];
+//         protectionByte ^= c;
+//         if (c == ESCAPE)
+//         {
+//             frame->frame[sfCount] = ESCAPE;
+//             frame->frame[sfCount + 1] = ESCAPE_THE_ESCAPE;
+//             sfCount += 2;
+//         }
+//         else if (c == F)
+//         {
+//             frame->frame[sfCount] = ESCAPE;
+//             frame->frame[sfCount + 1] = ESCAPE_THE_FLAG;
+//             sfCount += 2;
+//         }
+//         else
+//         {
+//             frame->frame[sfCount] = c;
+//             sfCount++;
+//         }
+//     }
+
+//     if (protectionByte == F) //Special and rare case
+//     {
+//         if (sfCount + 3 > frame->stuffedFrameSize) // the previous operation filled the buffer
+//         {
+//             allocSpace(frame, 3);
+//         }
+//         frame->frame[sfCount] = ESCAPE;
+//         sfCount++;
+//         frame->frame[sfCount] = ESCAPE_THE_FLAG;
+//         sfCount++;
+//         frame->frame[sfCount] = F;
+//         sfCount++;
+//     }
+//     else
+//     {
+//         if (sfCount + 2 > frame->stuffedFrameSize) // the previous operation filled the buffer
+//         {
+//             allocSpace(frame, 2);
+//         }
+//         frame->frame[sfCount] = protectionByte;
+//         sfCount++;
+//         frame->frame[sfCount] = F;
+//         sfCount++;
+//     }
+//     return 0;
+// }
+
 int stuff(struct frame *frame, char tostuff[], int tostuffSize)
 {
-    if (frame->stuffedFrameSize == 0)
-    {
-        initializeFrame(frame); //Makes size of the stuffed frame to be MAX_SIZE
-    }
+    // Tostuff will not overflow the buffer
+
     int sfCount = FIRST_DATA_INDEX; //stuffed count
     int nsfCount = 0;               //nonstuffed count
     int flagged = 0;
@@ -17,91 +83,73 @@ int stuff(struct frame *frame, char tostuff[], int tostuffSize)
 
     for (int i = 0; i < tostuffSize; i++)
     {
-
-        //Gets 20 more bytes of space in the stuffedFrame
-        if (sfCount == frame->stuffedFrameSize - 2) //-2 because that's the maximum amount of space that we will add in an iteration
-        {
-            allocSpace(frame, SPACE_ALLOC_SIZE);
-        }
-
         c = tostuff[i];
         protectionByte ^= c;
         if (c == ESCAPE)
         {
-            frame->stuffedFrame[sfCount] = ESCAPE;
-            frame->stuffedFrame[sfCount + 1] = ESCAPE_THE_ESCAPE;
+            frame->frame[sfCount] = ESCAPE;
+            frame->frame[sfCount + 1] = ESCAPE_THE_ESCAPE;
             sfCount += 2;
         }
         else if (c == F)
         {
-            frame->stuffedFrame[sfCount] = ESCAPE;
-            frame->stuffedFrame[sfCount + 1] = ESCAPE_THE_FLAG;
+            frame->frame[sfCount] = ESCAPE;
+            frame->frame[sfCount + 1] = ESCAPE_THE_FLAG;
             sfCount += 2;
         }
         else
         {
-            frame->stuffedFrame[sfCount] = c;
+            frame->frame[sfCount] = c;
             sfCount++;
         }
     }
 
     if (protectionByte == F) //Special and rare case
     {
-        if (sfCount + 3 > frame->stuffedFrameSize) // the previous operation filled the buffer
-        {
-            allocSpace(frame, 3);
-        }
-        frame->stuffedFrame[sfCount] = ESCAPE;
+
+        frame->frame[sfCount] = ESCAPE;
         sfCount++;
-        frame->stuffedFrame[sfCount] = ESCAPE_THE_FLAG;
+        frame->frame[sfCount] = ESCAPE_THE_FLAG;
         sfCount++;
-        frame->stuffedFrame[sfCount] = F;
+        frame->frame[sfCount] = F;
         sfCount++;
     }
     else
     {
-        if (sfCount + 2 > frame->stuffedFrameSize) // the previous operation filled the buffer
-        {
-            allocSpace(frame, 2);
-        }
-        frame->stuffedFrame[sfCount] = protectionByte;
+        frame->frame[sfCount] = protectionByte;
         sfCount++;
-        frame->stuffedFrame[sfCount] = F;
+        frame->frame[sfCount] = F;
         sfCount++;
     }
-    return 0;
+    return sfCount;
 }
 
-int destuff(struct frame *frame, char *buffer, int bufferCapacity, int *bufferLength)
+
+int destuff(struct frame *frame, char *buffer)
 {
     //Previous functions should have checked the first protection byte
     //We will only check the second
 
-    if (frame->stuffedFrameSize == 0)
-    {
-        initializeFrame(frame);
-    }
-
-    if (bufferCapacity == 0)
-    {
-        allocBufferSpace(buffer, bufferCapacity, SPACE_ALLOC_SIZE);
-    }
+    // if (bufferCapacity == 0)
+    // {
+    //     allocBufferSpace(buffer, bufferCapacity, SPACE_ALLOC_SIZE);
+    // }
 
     int sfcount = FIRST_DATA_INDEX;
     int nsfCount = 0;
     char c, protectionByte = 0;
 
-    for (int i = FIRST_DATA_INDEX; frame->stuffedFrame[i] != F; i++)
+    for (int i = FIRST_DATA_INDEX; frame->frame[i] != F; i++)
     {
-        if (nsfCount == bufferCapacity)
-        {
-            allocBufferSpace(buffer, bufferCapacity, SPACE_ALLOC_SIZE);
-        }
-        c = frame->stuffedFrame[i];
+        // if (nsfCount == bufferCapacity)
+        // {
+        //     allocBufferSpace(buffer, bufferCapacity, SPACE_ALLOC_SIZE);
+        // }
+        c = frame->frame[i];
         if (c == ESCAPE)
         {
             i++;
-            c = frame->stuffedFrame[i];
+            c = frame->frame[i];
             if (c == ESCAPE_THE_FLAG)
             {
                 buffer[nsfCount] = F;
@@ -135,14 +183,14 @@ int destuff(struct frame *frame, char *buffer, int bufferCapacity, int *bufferLe
     }
 }
 
-void allocSpace(struct frame *frame, int space)
-{
-    char *newFrame = (char *)malloc(frame->stuffedFrameSize + space);
-    memcpy((void *)newFrame, (void *)frame->stuffedFrame, frame->stuffedFrameSize);
-    free(frame->stuffedFrame);
-    frame->stuffedFrame = newFrame;
-    frame->stuffedFrameSize += space;
-}
+// void allocSpace(struct frame *frame, int space)
+// {
+//     char *newFrame = (char *)malloc(frame->stuffedFrameSize + space);
+//     memcpy((void *)newFrame, (void *)frame->frame, frame->stuffedFrameSize);
+//     free(frame->frame);
+//     frame->frame = newFrame;
+//     frame->stuffedFrameSize += space;
+// }
 
 int allocBufferSpace(char *buffer, int prevSpace, int extraSpace)
 {

@@ -3,6 +3,7 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include "time.h" //For FER
 #include "commandMessages.h"
 
 int flag = 1, count = 0;
@@ -11,11 +12,49 @@ struct PHYSICAL_OPTIONS OPTIONS;
 struct PHYSICAL_OPTIONS CREATE_PHYSICAL_OPTIONS()
 {
     struct PHYSICAL_OPTIONS options = {0, 0, 0, 0};
+    srand(time(NULL));
     return options;
 }
 
 void
-atende() // atende alarme
+OPTIONS_GENERATE_FER(struct linkLayer *link)
+{
+    int r;
+    // Errors for head
+    if (OPTIONS.OPTION_FER_HEAD != 0)
+    {
+        for (int i = 1; i <= 3; i++)
+        {
+            // Head is beteeen indices 1 and 3 inclusively
+            r = rand() % OPTIONS.OPTION_FER_HEAD;
+            if (!r)
+            {
+                // 1 in a OPTIONS_FER_DATA chance of being a 0
+                // We will totally switch the byte.
+                link->frame.frame[i] = link->frame.frame[i] ^ 0xff;
+            }
+        }
+    }
+
+    // Errors for data
+    if (OPTIONS.OPTION_FER_DATA != 0)
+    {
+        for (int i = 4; i < link->frame.frameUsedSize - 1; i++)
+        {
+            // Creating errors in the information and bcc2 bytes. Flag is ignored hence -1
+            // Keep in mind we are creating errors in the stuffed message. Simulating errors in transmissions
+            r = rand() % OPTIONS.OPTION_FER_DATA;
+            if (!r)
+            {
+                // 1 in a OPTIONS_FER_DATA chance of being a 0
+                // We will totally switch the byte.
+                link->frame.frame[i] = link->frame.frame[i] ^ 0xff;
+            }
+        }
+    }
+}
+
+void atende() // atende alarme
 {
     if (OPTIONS.OPTION_NO_ALARMS)
     {
@@ -221,8 +260,31 @@ int readLinkInformation(struct linkLayer *link, char *buffer, char A, int *Nr)
         link->frame.frame[link->frame.frameUsedSize] = byte;
         link->frame.frameUsedSize++;
         state = readInformationStateMachine(state, A, byte, Nr);
+
+        // Enforcing FER Generation will reprocess the head after errors might have been added to it
         if (state == RI_INFORMATION_STOP)
         {
+            if (OPTIONS.OPTION_FER)
+            {
+                OPTIONS_GENERATE_FER(link);
+                state = RI_START;
+                for (int i = 0; i < link->frame.frameUsedSize; i++)
+                {
+                    byte = link->frame.frame[i];
+                    state = readInformationStateMachine(state, A, byte, Nr);
+                }
+            }
+        }
+        if (state == RI_INFORMATION_STOP)
+        {
+            // Let's simulate FER ERRORS
+            if (OPTIONS.OPTION_FER)
+            {
+                // What if we generated a error in the head. We are already in the RI_INFORMATIN_STOP so taht would mean the head was fine.
+                // HEAD errors should have been before?
+                OPTIONS_GENERATE_FER(link);
+            }
+
             if ((*Nr) == link->sequenceNumber)
             {
                 // Correct one

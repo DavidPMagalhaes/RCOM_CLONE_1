@@ -15,6 +15,8 @@ struct PHYSICAL_OPTIONS CREATE_PHYSICAL_OPTIONS();
 
 void PHYSICAL_PROTOCOL_OPTIONS(struct PHYSICAL_OPTIONS cmd_options);
 
+void OPTIONS_GENERATE_FER(struct linkLayer *link);
+
 typedef enum
 {
     START,
@@ -54,6 +56,8 @@ typedef enum
     RI_READ_STOP_UA,
     RI_RESET
 } readInformationState;
+
+void atende();
 
 void writeLinkResponse(struct linkLayer *link);
 

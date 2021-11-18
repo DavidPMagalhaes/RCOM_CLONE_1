@@ -3,6 +3,18 @@
 
 #include "dataProtocol.h"
 
+struct PHYSICAL_OPTIONS
+{
+    int OPTION_NO_ALARMS;
+    int OPTION_FER;
+    int OPTION_FER_HEAD;
+    int OPTION_FER_DATA;
+};
+
+struct PHYSICAL_OPTIONS CREATE_PHYSICAL_OPTIONS();
+
+void PHYSICAL_PROTOCOL_OPTIONS(struct PHYSICAL_OPTIONS cmd_options);
+
 typedef enum
 {
     START,
@@ -26,7 +38,8 @@ typedef enum
     WI_STOP_RR
 } writeInformationState;
 
-typedef enum {
+typedef enum
+{
     RI_START,
     RI_FLAG_RCV,
     RI_A_RCV,
@@ -40,9 +53,7 @@ typedef enum {
     RI_READ_STOP,
     RI_READ_STOP_UA,
     RI_RESET
-} readInformationState; 
-
-void programOptions(int bitmask);
+} readInformationState;
 
 void writeLinkResponse(struct linkLayer *link);
 
@@ -58,5 +69,5 @@ int commandStateMachine(commandState state, char A, char C, char byte);
 
 int writeInformationStateMachine(writeInformationState state, char A, char byte, int *Nr);
 
-int readInformationStateMachine (readInformationState state, char A, char byte, int *Nr);
+int readInformationStateMachine(readInformationState state, char A, char byte, int *Nr);
 #endif

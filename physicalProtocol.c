@@ -6,11 +6,18 @@
 #include "commandMessages.h"
 
 int flag = 1, count = 0;
-int no_alarms = 0;
+struct PHYSICAL_OPTIONS OPTIONS;
 
-void atende() // atende alarme
+struct PHYSICAL_OPTIONS CREATE_PHYSICAL_OPTIONS()
 {
-    if (no_alarms)
+    struct PHYSICAL_OPTIONS options = {0, 0, 0, 0};
+    return options;
+}
+
+void
+atende() // atende alarme
+{
+    if (OPTIONS.OPTION_NO_ALARMS)
     {
         return;
     }
@@ -19,12 +26,9 @@ void atende() // atende alarme
     count++;
 }
 
-void programOptions(int bitmask)
+void PHYSICAL_PROTOCOL_OPTIONS(struct PHYSICAL_OPTIONS cmd_options)
 {
-    if (1 & bitmask)
-    {
-        no_alarms = 1;
-    }
+    OPTIONS = cmd_options;
 }
 
 void writeLinkResponse(struct linkLayer *link)

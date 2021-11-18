@@ -17,6 +17,8 @@ int main(int argc, char **argv)
     int flag = 0, bitmask = 0;
     int res;
     long test;
+    int FER_head, FER_data;
+    struct PHYSICAL_OPTIONS options = CREATE_PHYSICAL_OPTIONS();
     char message[] = "hello there!";
     if (argc == 1)
     {
@@ -30,11 +32,25 @@ int main(int argc, char **argv)
             printf("%s\n", argv[i]);
             if (!strcmp(argv[i], "-noAlarms"))
             {
-                bitmask |= (1 << 0);
+                printf("-noAlarms enabled\n");
+                options.OPTION_NO_ALARMS = 1;
+            }
+            else if (!strcmp(argv[i], "-FER"))
+            {
+                if (i + 2 >= argc)
+                {
+                    printf("Wrong -FER syntax\n");
+                    exit(1);
+                }
+                options.OPTION_FER = 1;
+                options.OPTION_FER_HEAD = (int)strtol(argv[i + 1], NULL, 10);
+                options.OPTION_FER_DATA = (int)strtol(argv[i + 2], NULL, 10);
+                printf("-FER enabled with head odds %d and data odds %d\n", options.OPTION_FER_HEAD, options.OPTION_FER_DATA);
+                i += 2;
             }
         }
     }
-    programOptions(bitmask);
+    PHYSICAL_PROTOCOL_OPTIONS(options);
     switch (test)
     {
     case 1:

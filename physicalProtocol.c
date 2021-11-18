@@ -84,7 +84,7 @@ void writeLinkResponse(struct linkLayer *link)
 
 int writeLinkCommand(struct linkLayer *link, char A, char C)
 {
-    printf("writing link command");
+    // printf("writing link command");
     int res;
     struct frame frame = link->frame;
     char byte;
@@ -130,7 +130,7 @@ int writeLinkCommand(struct linkLayer *link, char A, char C)
 
 int writeLinkInformation(struct linkLayer *link, char A)
 {
-    printf("writing link command");
+    // printf("writing link command");
     int res, Nr = 0;
     struct frame frame = link->frame;
     char byte;
@@ -209,7 +209,7 @@ int writeLinkInformation(struct linkLayer *link, char A)
 
 int readLinkCommand(struct linkLayer *link, char A, char C)
 {
-    printf("reading link command");
+    // printf("reading link command");
     fflush(stdout);
     int res;
     struct frame frame = link->frame;
@@ -239,7 +239,7 @@ int readLinkCommand(struct linkLayer *link, char A, char C)
 
 int readLinkInformation(struct linkLayer *link, char *buffer, char A, int *Nr)
 {
-    printf("reading link command");
+    // printf("reading link command");
     fflush(stdout);
     int res;
     struct frame frame = link->frame;

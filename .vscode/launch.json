@@ -6,11 +6,24 @@
     "configurations": [
 
         {
+            "name": "Transmitter Random Messages",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/main.exe",
+            "args": ["8", "-noAlarms"],
+            "environment": [{ "name": "config", "value": "Debug" }],
+            "cwd": "${workspaceFolder}",
+            "miDebuggerPath": "/usr/bin/gdb",
+            "stopAtConnect": true
+            // "miDebuggerPath": "C:\\Program Files (x86)\\mingw-w64\\i686-8.1.0-posix-dwarf-rt_v6-rev0\\mingw32\\bin\\gdb"
+
+        },
+        {
             "name": "Transmitter Message Special chars",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/main.exe",
-            "args": ["7", "-noAlarms", "-FER", "100", "2000"],
+            "args": ["7", "-noAlarms"],
             "environment": [{ "name": "config", "value": "Debug" }],
             "cwd": "${workspaceFolder}",
             "miDebuggerPath": "/usr/bin/gdb",

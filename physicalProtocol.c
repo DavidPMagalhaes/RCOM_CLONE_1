@@ -194,11 +194,11 @@ int readLinkCommand(struct linkLayer *link, char A, char C)
     }
 }
 
-int readLinkInformation(struct linkLayer *link, char *buffer, char A)
+int readLinkInformation(struct linkLayer *link, char *buffer, char A, int *Nr)
 {
     printf("reading link command");
     fflush(stdout);
-    int res, Nr;
+    int res;
     struct frame frame = link->frame;
     char byte;
     commandState state = RI_START;
@@ -216,10 +216,10 @@ int readLinkInformation(struct linkLayer *link, char *buffer, char A)
         }
         link->frame.frame[link->frame.frameUsedSize] = byte;
         link->frame.frameUsedSize++;
-        state = readInformationStateMachine(state, A, byte, &Nr);
+        state = readInformationStateMachine(state, A, byte, Nr);
         if (state == RI_INFORMATION_STOP)
         {
-            if (Nr == link->sequenceNumber)
+            if ((*Nr) == link->sequenceNumber)
             {
                 // Correct one
                 // Received information successfully
@@ -227,6 +227,7 @@ int readLinkInformation(struct linkLayer *link, char *buffer, char A)
             }
             else
             {
+                // Duplicate package
                 return -2;
             }
         }
@@ -237,6 +238,7 @@ int readLinkInformation(struct linkLayer *link, char *buffer, char A)
         }
         else if (state == RI_READ_STOP_UA)
         {
+            // Confirm disconenct
             return -3;
         }
         else if (state == RI_RESET)

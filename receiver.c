@@ -19,11 +19,11 @@ int openReceiver(struct linkLayer *link)
 
 int readReceiver(struct linkLayer *link, char *buffer)
 {
-    int res;
+    int res, Nr;
     while (1)
     {
         link->frame.frameUsedSize = 0;
-        res = readLinkInformation(link, buffer, A_EM);
+        res = readLinkInformation(link, buffer, A_EM, &Nr);
         if (res == -1)
         {
             // Received message to disconnect
@@ -54,9 +54,21 @@ int readReceiver(struct linkLayer *link, char *buffer)
         if (res == -1)
         {
             // There was corruption in the data
-            REJMessage(link->frame.frame, link->sequenceNumber);
-            link->frame.frameUsedSize = CMDSZ; // Reset the size of the buffer
-            writeLinkResponse(link);
+            if (Nr != link->sequenceNumber)
+            {
+                // Corrupted but it was from a previous package.
+                // Ask for next package
+                RRMessage(link->frame.frame, link->sequenceNumber);
+                link->frame.frameUsedSize = CMDSZ; // Reset the size of the buffer
+                writeLinkResponse(link);
+            }
+            else
+            {
+                // The current package was corrupted
+                REJMessage(link->frame.frame, link->sequenceNumber);
+                link->frame.frameUsedSize = CMDSZ; // Reset the size of the buffer
+                writeLinkResponse(link);
+            }
 
             // Go back to reading
             continue;

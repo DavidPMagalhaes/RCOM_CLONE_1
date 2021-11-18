@@ -52,7 +52,7 @@ int writeLinkInformation(struct linkLayer *link, char A);
 
 int readLinkCommand(struct linkLayer *link, char A, char C);
 
-int readLinkInformation(struct linkLayer *link, char *buffer, char A);
+int readLinkInformation(struct linkLayer *link, char *buffer, char A, int *Nr);
 
 int commandStateMachine(commandState state, char A, char C, char byte);
 

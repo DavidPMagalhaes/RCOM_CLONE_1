@@ -114,6 +114,15 @@ int stuff(struct frame *frame, char tostuff[], int tostuffSize)
         frame->frame[sfCount] = F;
         sfCount++;
     }
+    else if (protectionByte == ESCAPE)
+    {
+        frame->frame[sfCount] = ESCAPE;
+        sfCount++;
+        frame->frame[sfCount] = ESCAPE_THE_ESCAPE;
+        sfCount++;
+        frame->frame[sfCount] = F;
+        sfCount++;
+    }
     else
     {
         frame->frame[sfCount] = protectionByte;
@@ -123,7 +132,6 @@ int stuff(struct frame *frame, char tostuff[], int tostuffSize)
     }
     return sfCount;
 }
-
 
 int destuff(struct frame *frame, char *buffer)
 {

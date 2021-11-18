@@ -167,7 +167,7 @@ int writeLinkInformation(struct linkLayer *link, char A)
         state = writeInformationStateMachine(state, A, byte, &Nr);
         if (state == WI_STOP_REJ)
         {
-            if (Nr != link->sequenceNumber) //Information referring to this frame
+            if (Nr == link->sequenceNumber) //Information referring to this frame
             {
                 // We will need to retransmit
                 // We will reset the timeout and the attempts as if we had just received the llwrite from the application layer

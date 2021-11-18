@@ -27,7 +27,7 @@ int main(int argc, char **argv)
     int message_7_len = 0;
     char message_8[255];
     int message_8_len = 0;
-    int message_8_rep = 5;
+    int message_8_rep = 20;
     time_t random_seed_8;
 
     if (argc == 1)
@@ -235,7 +235,7 @@ int main(int argc, char **argv)
         }
         usleep(100 * 1000);
         random_seed_8 = time(NULL);
-        random_seed_8 = 1637260507;
+        random_seed_8 = 1637263042;
         printf("%ld", random_seed_8);
         srand(random_seed_8);
         message_8_len = 255;
@@ -243,11 +243,6 @@ int main(int argc, char **argv)
         {
             for (int j = 0; j < message_8_len; j++)
             {
-                // Error on j = 113
-                if (j == 113)
-                {
-                    printf("a");
-                }
                 message_8[i] = (char)(rand() % 256);
             }
             res = llwrite(fd_transmitter, message_8, message_8_len);
@@ -263,6 +258,7 @@ int main(int argc, char **argv)
         {
             printf("Transmitter: Successfully closed transmitter\n");
         }
+        printf("%ld", random_seed_8);
         break;
     default:
         break;

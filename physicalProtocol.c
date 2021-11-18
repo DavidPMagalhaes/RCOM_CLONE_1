@@ -271,12 +271,20 @@ int commandStateMachine(commandState state, char A, char C, char byte)
         {
             return A_RCV;
         }
+        if (byte == F)
+        {
+            return FLAG_RCV;
+        }
         return START;
     case A_RCV:
         protectionByte ^= C;
         if (byte == C)
         {
             return C_RCV;
+        }
+        if (byte == F)
+        {
+            return FLAG_RCV;
         }
         return START;
     case C_RCV:
@@ -285,6 +293,11 @@ int commandStateMachine(commandState state, char A, char C, char byte)
         {
             return BCC_OK;
         }
+        if (byte == F)
+        {
+            return FLAG_RCV;
+        }
+        // If not should I jump to a BCC_NOT_OK instead?
         return START;
     case BCC_OK:
         if (byte == F)
@@ -317,6 +330,10 @@ int writeInformationStateMachine(writeInformationState state, char A, char byte,
         {
             return WI_A_RCV;
         }
+        if (byte == F)
+        {
+            return WI_FLAG_RCV;
+        }
         return WI_START;
     case WI_A_RCV:
         b = (u_int8_t)byte;
@@ -331,6 +348,10 @@ int writeInformationStateMachine(writeInformationState state, char A, char byte,
         {
             return WI_RR_RCV;
         }
+        if (byte == F)
+        {
+            return WI_FLAG_RCV;
+        }
         return WI_START;
     case WI_REJ_RCV:
         protectionByte ^= byte;
@@ -338,12 +359,20 @@ int writeInformationStateMachine(writeInformationState state, char A, char byte,
         {
             return WI_BCC_REJ_OK;
         }
+        if (byte == F)
+        {
+            return WI_FLAG_RCV;
+        }
         return WI_START;
     case WI_RR_RCV:
         protectionByte ^= byte;
         if (protectionByte == 0)
         {
             return WI_BCC_RR_OK;
+        }
+        if (byte == F)
+        {
+            return WI_FLAG_RCV;
         }
         return WI_START;
     case WI_BCC_REJ_OK:
@@ -382,6 +411,10 @@ int readInformationStateMachine(readInformationState state, char A, char byte, i
             protectionByte ^= byte;
             return RI_A_RCV;
         }
+        if (byte == F)
+        {
+            return RI_FLAG_RCV;
+        }
         return RI_RESET;
     case RI_A_RCV:
         protectionByte ^= byte;
@@ -398,12 +431,20 @@ int readInformationStateMachine(readInformationState state, char A, char byte, i
         {
             return RI_UA;
         }
+        if (byte == F)
+        {
+            return RI_FLAG_RCV;
+        }
         return RI_RESET;
     case RI_INF:
         protectionByte ^= byte;
         if (protectionByte == 0)
         {
             return RI_INFORMATION_READ;
+        }
+        if (byte == F)
+        {
+            return RI_FLAG_RCV;
         }
         return RI_RESET;
     case RI_DISC:
@@ -412,12 +453,20 @@ int readInformationStateMachine(readInformationState state, char A, char byte, i
         {
             return RI_BCC_DISC_OK;
         }
+        if (byte == F)
+        {
+            return RI_FLAG_RCV;
+        }
         return RI_RESET;
     case RI_UA:
         protectionByte ^= byte;
         if (protectionByte == 0)
         {
             return RI_BCC_UA_OK;
+        }
+        if (byte == F)
+        {
+            return RI_FLAG_RCV;
         }
         return RI_RESET;
     case RI_BCC_DISC_OK:

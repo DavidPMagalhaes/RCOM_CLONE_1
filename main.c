@@ -243,11 +243,16 @@ int main(int argc, char **argv)
         {
             for (int j = 0; j < message_8_len; j++)
             {
+                // Error on j = 113
+                if (j == 113)
+                {
+                    printf("a");
+                }
                 message_8[i] = (char)(rand() % 256);
-                res = llwrite(fd_transmitter, message_8, message_8_len);
-                printf("Transmitter: %d bytes\n", res);
-                printFrame(message_8, message_8_len);
             }
+            res = llwrite(fd_transmitter, message_8, message_8_len);
+            printf("Transmitter: %d bytes\n", res);
+            printFrame(message_8, message_8_len);
         }
         printf("Transmitter: Asking to close\n");
         if (llclose(fd_transmitter))

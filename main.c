@@ -5,6 +5,8 @@
 #include <string.h>
 
 #include "physicalProtocol.h"
+#include "commandMessages.h"
+
 int main(int argc, char **argv)
 {
 
@@ -14,12 +16,15 @@ int main(int argc, char **argv)
     transmitter = TRANSMITTER;
     int fd_receiver, fd_transmitter;
     char receiver_buffer[255];
-    int flag = 0, bitmask = 0;
+    int flag = 0;
     int res;
     long test;
     int FER_head, FER_data;
     struct PHYSICAL_OPTIONS options = CREATE_PHYSICAL_OPTIONS();
-    char message[] = "hello there!";
+    char message_5[] = "hello there!";
+    char message_6[255];
+    int message_6_len = 0;
+
     if (argc == 1)
     {
         test = 1;
@@ -142,8 +147,66 @@ int main(int argc, char **argv)
         }
         usleep(100 * 1000);
 
-        res = llwrite(fd_transmitter, message, strlen(message));
-        printf("Transmitter: %s: %d bytes\n", message, res);
+        res = llwrite(fd_transmitter, message_5, strlen(message_5));
+        printf("Transmitter: %s: %d bytes\n", message_5, res);
+        usleep(100 * 1000);
+        printf("Transmitter: Asking to close\n");
+        if (llclose(fd_transmitter))
+        {
+            printf("Transmitter: Error closing transmitter\n");
+        }
+        else
+        {
+            printf("Transmitter: Successfully closed transmitter\n");
+        }
+        break;
+    case 6:
+        printf("Receiver: opening receiver\n");
+        fd_receiver = llopen(11, RECEIVER);
+        if (fd_receiver == -1)
+        {
+            printf("Error setting receiver\n");
+        }
+        else
+        {
+            printf("Receiver: Receiver opened\n");
+        }
+        printf("Receiver: Reading...\n");
+        while (1)
+        {
+            res = llread(fd_receiver, receiver_buffer);
+            if (res == 0)
+            {
+                printf("Receiver: Disconnected successfully\n");
+                break;
+            }
+            else
+            {
+                printFrame(receiver_buffer, res);
+                printf("Receiver:");
+            }
+        }
+        break;
+    case 7:
+        fd_transmitter = llopen(10, TRANSMITTER);
+        if (fd_transmitter == -1)
+        {
+            printf("Transmitter: Error setting transmitter\n");
+        }
+        else
+        {
+            printf("Transmitter: Transmitter opened\n");
+        }
+        usleep(100 * 1000);
+
+        strcpy(message_6, "A mesasge with '\\0' characters\n");
+        message_6_len = strlen(message_6);
+        message_6[2] = (char)0x00;
+        message_6[4] = (char)F;
+        message_6[6] = (char)0x7d;
+        res = llwrite(fd_transmitter, message_6, message_6_len);
+        printf("Transmitter: %s: %d bytes\n", message_6, res);
+        printFrame(message_6, message_6_len);
         usleep(100 * 1000);
         printf("Transmitter: Asking to close\n");
         if (llclose(fd_transmitter))

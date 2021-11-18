@@ -244,7 +244,7 @@ int readLinkInformation(struct linkLayer *link, char *buffer, char A, int *Nr)
     int res;
     struct frame frame = link->frame;
     char byte;
-    commandState state = RI_START;
+    readInformationState state = RI_START;
     while (1)
     {
         res = read(link->fd, &byte, 1);
@@ -277,13 +277,6 @@ int readLinkInformation(struct linkLayer *link, char *buffer, char A, int *Nr)
         }
         if (state == RI_INFORMATION_STOP)
         {
-            // Let's simulate FER ERRORS
-            if (OPTIONS.OPTION_FER)
-            {
-                // What if we generated a error in the head. We are already in the RI_INFORMATIN_STOP so taht would mean the head was fine.
-                // HEAD errors should have been before?
-                OPTIONS_GENERATE_FER(link);
-            }
 
             if ((*Nr) == link->sequenceNumber)
             {
@@ -456,6 +449,8 @@ int writeInformationStateMachine(writeInformationState state, char A, char byte,
 
 int readInformationStateMachine(readInformationState state, char A, char byte, int *Nr)
 {
+
+    u_int8_t b;
     static int protectionByte = 0;
 
     switch (state)
@@ -479,9 +474,11 @@ int readInformationStateMachine(readInformationState state, char A, char byte, i
         }
         return RI_RESET;
     case RI_A_RCV:
+        b = (u_int8_t)byte;
+        (*Nr) = b >> 6;
         protectionByte ^= byte;
         // Might be a error here because byte is not a u_int8_t and stuff happens
-        if (byte == 0 || byte == (1 << 6))
+        if (b == 0 || b == (1 << 6))
         {
             return RI_INF;
         }

@@ -1,17 +1,5 @@
 #include "commandMessages.h"
 
-int dataIsViable(char mes[], int size)
-{
-    {
-        char sum = 0;
-        for (int i = 0; i < size; i++)
-        {
-            sum ^= mes[i];
-        }
-        return sum == 0x00;
-    }
-}
-
 void printCommand(char buf[])
 {
     printf("Command:");

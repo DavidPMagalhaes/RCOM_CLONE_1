@@ -17,8 +17,6 @@
 #define REJ_N1 0x81
 #define CMDSZ 5 //[FLAG,ADDRESS,CMD,BCC,FLAG]
 
-int dataIsViable(char mes[], int size);
-
 void printCommand(char buf[]);
 
 void printFrame(char *buf, int bufLen);

@@ -31,6 +31,8 @@ int readReceiver(struct linkLayer *link, char *buffer)
             DISCMessage(link->frame.frame, A_EM);
             link->frame.frameUsedSize = CMDSZ;
             writeLinkResponse(link);
+
+            // Instead of returning to the loop after having written writeLinkResponse, I could do a writeLinkCommand and return on success
             disconnecting = 1;
             continue;
         }

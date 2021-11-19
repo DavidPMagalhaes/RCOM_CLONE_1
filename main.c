@@ -27,7 +27,7 @@ int main(int argc, char **argv)
     int message_7_len = 0;
     char message_8[255];
     int message_8_len = 0;
-    int message_8_rep = 20;
+    int message_8_rep = 30;
     time_t random_seed_8;
 
     if (argc == 1)

@@ -82,12 +82,12 @@ void writeLinkResponse(struct linkLayer *link)
     }
 }
 
-int writeLinkCommand(struct linkLayer *link, char A, char C)
+int writeLinkCommand(struct linkLayer *link, u_int8_t A, u_int8_t C)
 {
     // printf("writing link command");
     int res;
     struct frame frame = link->frame;
-    char byte;
+    u_int8_t byte;
     commandState state = START;
     flag = 1;
     count = 0;
@@ -128,12 +128,12 @@ int writeLinkCommand(struct linkLayer *link, char A, char C)
     return -1; //Couldn't receive an answer Timeout
 }
 
-int writeLinkInformation(struct linkLayer *link, char A)
+int writeLinkInformation(struct linkLayer *link, u_int8_t A)
 {
     // printf("writing link command");
     int res, Nr = 0;
     struct frame frame = link->frame;
-    char byte;
+    u_int8_t byte;
     flag = 1;
     writeInformationState state = WI_START;
 
@@ -207,13 +207,13 @@ int writeLinkInformation(struct linkLayer *link, char A)
     return -1; //Couldn't receive an answer Timeout
 }
 
-int readLinkCommand(struct linkLayer *link, char A, char C)
+int readLinkCommand(struct linkLayer *link, u_int8_t A, u_int8_t C)
 {
     // printf("reading link command");
     fflush(stdout);
     int res;
     struct frame frame = link->frame;
-    char byte;
+    u_int8_t byte;
     commandState state = START;
 
     while (1)
@@ -237,13 +237,13 @@ int readLinkCommand(struct linkLayer *link, char A, char C)
     }
 }
 
-int readLinkInformation(struct linkLayer *link, char *buffer, char A, int *Nr)
+int readLinkInformation(struct linkLayer *link, u_int8_t *buffer, u_int8_t A, int *Nr)
 {
     // printf("reading link command");
     fflush(stdout);
     int res;
     struct frame frame = link->frame;
-    char byte;
+    u_int8_t byte;
     readInformationState state = RI_START;
     while (1)
     {
@@ -308,7 +308,7 @@ int readLinkInformation(struct linkLayer *link, char *buffer, char A, int *Nr)
     }
 }
 
-int commandStateMachine(commandState state, char A, char C, char byte)
+int commandStateMachine(commandState state, u_int8_t A, u_int8_t C, u_int8_t byte)
 {
     static int protectionByte = 0;
     switch (state)
@@ -366,9 +366,8 @@ int commandStateMachine(commandState state, char A, char C, char byte)
     }
 }
 
-int writeInformationStateMachine(writeInformationState state, char A, char byte, int *Nr)
+int writeInformationStateMachine(writeInformationState state, u_int8_t A, u_int8_t byte, int *Nr)
 {
-    u_int8_t b;
     static int protectionByte = 0;
     switch (state)
     {
@@ -391,15 +390,14 @@ int writeInformationStateMachine(writeInformationState state, char A, char byte,
         }
         return WI_START;
     case WI_A_RCV:
-        b = (u_int8_t)byte;
-        (*Nr) = b >> 7;
+        (*Nr) = byte >> 7;
 
         protectionByte ^= byte;
-        if (b == REJ || b == REJ_N1)
+        if (byte == REJ || byte == REJ_N1)
         {
             return WI_REJ_RCV;
         }
-        else if (b == RR || b == RR_N1)
+        else if (byte == RR || byte == RR_N1)
         {
             return WI_RR_RCV;
         }
@@ -447,10 +445,8 @@ int writeInformationStateMachine(writeInformationState state, char A, char byte,
     }
 }
 
-int readInformationStateMachine(readInformationState state, char A, char byte, int *Nr)
+int readInformationStateMachine(readInformationState state, u_int8_t A, u_int8_t byte, int *Nr)
 {
-
-    u_int8_t b;
     static int protectionByte = 0;
 
     switch (state)
@@ -474,11 +470,10 @@ int readInformationStateMachine(readInformationState state, char A, char byte, i
         }
         return RI_RESET;
     case RI_A_RCV:
-        b = (u_int8_t)byte;
-        (*Nr) = b >> 6;
+        (*Nr) = byte >> 6;
         protectionByte ^= byte;
         // Might be a error here because byte is not a u_int8_t and stuff happens
-        if (b == 0 || b == (1 << 6))
+        if (byte == 0 || byte == (1 << 6))
         {
             return RI_INF;
         }

@@ -61,17 +61,17 @@ void atende();
 
 void writeLinkResponse(struct linkLayer *link);
 
-int writeLinkCommand(struct linkLayer *link, char A, char C);
+int writeLinkCommand(struct linkLayer *link, u_int8_t A, u_int8_t C);
 
-int writeLinkInformation(struct linkLayer *link, char A);
+int writeLinkInformation(struct linkLayer *link, u_int8_t A);
 
-int readLinkCommand(struct linkLayer *link, char A, char C);
+int readLinkCommand(struct linkLayer *link, u_int8_t A, u_int8_t C);
 
-int readLinkInformation(struct linkLayer *link, char *buffer, char A, int *Nr);
+int readLinkInformation(struct linkLayer *link, u_int8_t *buffer, u_int8_t A, int *Nr);
 
-int commandStateMachine(commandState state, char A, char C, char byte);
+int commandStateMachine(commandState state, u_int8_t A, u_int8_t C, u_int8_t byte);
 
-int writeInformationStateMachine(writeInformationState state, char A, char byte, int *Nr);
+int writeInformationStateMachine(writeInformationState state, u_int8_t A, u_int8_t byte, int *Nr);
 
-int readInformationStateMachine(readInformationState state, char A, char byte, int *Nr);
+int readInformationStateMachine(readInformationState state, u_int8_t A, u_int8_t byte, int *Nr);
 #endif

@@ -10,11 +10,11 @@ int openTransmitter(struct linkLayer *link)
     SETMessage(link->frame.frame);
     link->frame.frameUsedSize = CMDSZ;
     printFrame(link->frame.frame, CMDSZ);
-    //The fact that I have to remember what to send here is annoying me. Perhaps make the commandMessages return a char[2] and use that for the state machine accordingly?
+    //The fact that I have to remember what to send here is annoying me. Perhaps make the commandMessages return a u_int8_t[2] and use that for the state machine accordingly?
     return writeLinkCommand(link, A_EM, UA);
 }
 
-int writeTransmitter(struct linkLayer *link, char *buffer, int length)
+int writeTransmitter(struct linkLayer *link, u_int8_t *buffer, int length)
 {
     int res;
     IMessage(link->frame.frame, link->sequenceNumber);
@@ -32,7 +32,7 @@ int writeTransmitter(struct linkLayer *link, char *buffer, int length)
 int closeTransmitter(struct linkLayer *link)
 {
     int res = 0;
-    char mes[6];
+    u_int8_t mes[6];
 
     DISCMessage(link->frame.frame, A_EM);
     link->frame.frameUsedSize = CMDSZ;

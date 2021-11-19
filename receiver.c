@@ -17,7 +17,7 @@ int openReceiver(struct linkLayer *link)
     return -1;
 }
 
-int readReceiver(struct linkLayer *link, char *buffer)
+int readReceiver(struct linkLayer *link, u_int8_t *buffer)
 {
     int res, Nr;
     int disconnecting = 0;

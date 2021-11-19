@@ -4,14 +4,14 @@
 #include <string.h>
 #include "commandMessages.h"
 
-int stuff(struct frame *frame, char tostuff[], int tostuffSize)
+int stuff(struct frame *frame, u_int8_t tostuff[], int tostuffSize)
 {
     // Tostuff will not overflow the buffer
 
     int sfCount = FIRST_DATA_INDEX; //stuffed count
     int nsfCount = 0;               //nonstuffed count
     int flagged = 0;
-    char c, protectionByte = 0;
+    u_int8_t c, protectionByte = 0;
 
     for (int i = 0; i < tostuffSize; i++)
     {
@@ -65,7 +65,7 @@ int stuff(struct frame *frame, char tostuff[], int tostuffSize)
     return sfCount;
 }
 
-int destuff(struct frame *frame, char *buffer)
+int destuff(struct frame *frame, u_int8_t *buffer)
 {
     //Previous functions should have checked the first protection byte
     //We will only check the second
@@ -77,7 +77,7 @@ int destuff(struct frame *frame, char *buffer)
 
     int sfcount = FIRST_DATA_INDEX;
     int nsfCount = 0;
-    char c, protectionByte = 0;
+    u_int8_t c, protectionByte = 0;
 
     for (int i = FIRST_DATA_INDEX; frame->frame[i] != F; i++)
     {

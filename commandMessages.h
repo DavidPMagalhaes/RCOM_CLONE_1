@@ -17,21 +17,21 @@
 #define REJ_N1 0x81
 #define CMDSZ 5 //[FLAG,ADDRESS,CMD,BCC,FLAG]
 
-void printCommand(char buf[]);
+void printCommand(u_int8_t buf[]);
 
-void printFrame(char *buf, int bufLen);
+void printFrame(u_int8_t *buf, int bufLen);
 
-void commandMessage(char buf[], char A, char C);
+void commandMessage(u_int8_t buf[], u_int8_t A, u_int8_t C);
 
-void SETMessage(char buf[]);
+void SETMessage(u_int8_t buf[]);
 
-void DISCMessage(char buf[], char A);
+void DISCMessage(u_int8_t buf[], u_int8_t A);
 
-void UAMessage(char buf[], char A);
+void UAMessage(u_int8_t buf[], u_int8_t A);
 
-void RRMessage(char buf[], int R);
+void RRMessage(u_int8_t buf[], int R);
 
-void REJMessage(char buf[], int R);
+void REJMessage(u_int8_t buf[], int R);
 
-void IMessage (char buf[], int S);
+void IMessage (u_int8_t buf[], int S);
 #endif

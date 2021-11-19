@@ -12,14 +12,14 @@
 
 //Stuffing and destuffing already take care of the protection byte
 
-int stuff(struct frame *frame, char tostuff[], int tostuffSize); //,char protectionByte); ??
+int stuff(struct frame *frame, u_int8_t tostuff[], int tostuffSize); //,u_int8_t protectionByte); ??
 
-int destuff(struct frame *frame, char *buffer);
-// int destuff(struct frame *frame, char *buffer, int bufferCapacity, int *bufferLength);
+int destuff(struct frame *frame, u_int8_t *buffer);
+// int destuff(struct frame *frame, u_int8_t *buffer, int bufferCapacity, int *bufferLength);
 
 
 void allocSpace(struct frame *frame, int space);
 
-int allocBufferSpace(char *buffer, int prevSpace, int extraSpace);
+int allocBufferSpace(u_int8_t *buffer, int prevSpace, int extraSpace);
 
 #endif //BYTESTUFFING_H

@@ -1,6 +1,8 @@
 #ifndef DATAPROTOCOL_H
 #define DATAPROTOCOL_H
 
+#include <sys/types.h>
+
 #define MAX_SIZE 255
 
 typedef enum
@@ -11,7 +13,7 @@ typedef enum
 
 struct frame
 {
-    char frame[MAX_SIZE*2 + 5 + 2]; // Trama
+    u_int8_t frame[MAX_SIZE*2 + 5 + 2]; // Trama
     // MAX_SIZE is maximum data size. *2 due to the stsuffing. 5 for the commands, 2 for the date proction byte that might need stuffing as well
     int frameUsedSize;
 };
@@ -33,9 +35,9 @@ falha*/
 
 int llopen(int porta, linkType type);
 
-int llwrite(int fd, char *buffer, int length);
+int llwrite(int fd, u_int8_t *buffer, int length);
 
-int llread(int fd, char *buffer);
+int llread(int fd, u_int8_t *buffer);
 
 int llclose(int fd);
 

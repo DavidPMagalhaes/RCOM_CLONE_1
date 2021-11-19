@@ -4,6 +4,8 @@
 #include <unistd.h>
 #include <string.h>
 #include <time.h>
+#include <sys/types.h>
+
 
 #include "physicalProtocol.h"
 #include "commandMessages.h"
@@ -25,7 +27,7 @@ int main(int argc, char **argv)
     char message_5[] = "hello there!";
     char message_7[255];
     int message_7_len = 0;
-    char message_8[255];
+    u_int8_t message_8[255];
     int message_8_len = 0;
     int message_8_rep = 30;
     time_t random_seed_8;
@@ -204,11 +206,11 @@ int main(int argc, char **argv)
         }
         usleep(100 * 1000);
 
-        strcpy(message_7, "A mesasge with '\\0' characters\n");
+        strcpy(message_7, "A message with '\\0' characters\n");
         message_7_len = strlen(message_7);
-        message_7[2] = (char)0x00;
-        message_7[4] = (char)F;
-        message_7[6] = (char)0x7d;
+        message_7[2] = 0x00;
+        message_7[4] = F;
+        message_7[6] = 0x7d;
         res = llwrite(fd_transmitter, message_7, message_7_len);
         printf("Transmitter: %s: %d bytes\n", message_7, res);
         printFrame(message_7, message_7_len);
@@ -243,7 +245,7 @@ int main(int argc, char **argv)
         {
             for (int j = 0; j < message_8_len; j++)
             {
-                message_8[i] = (char)(rand() % 256);
+                message_8[j] = (rand() % 256);
             }
             res = llwrite(fd_transmitter, message_8, message_8_len);
             printf("Transmitter: %d bytes\n", res);

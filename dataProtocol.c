@@ -3,6 +3,7 @@
 #include <termios.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <sys/types.h>
 #include "setFD.h"
 #include "transmitter.h"
 #include "receiver.h"
@@ -14,7 +15,7 @@ struct linkLayer link;
 // {
 //     printf("initializing frame inside");
 //     fflush(stdout);
-//     char *newFrame = (char *)malloc(MAX_SIZE);
+//     u_int8_t *newFrame = (u_int8_t *)malloc(MAX_SIZE);
 //     printf("mem alloc");
 //     fflush(stdout);
 //     frame->frameSize = MAX_SIZE;
@@ -63,7 +64,7 @@ int llopen(int porta, linkType type)
     return -1;
 }
 
-int llwrite(int fd, char *buffer, int length)
+int llwrite(int fd, u_int8_t *buffer, int length)
 {
     if(fd != link.fd){
         // do something
@@ -71,7 +72,7 @@ int llwrite(int fd, char *buffer, int length)
     return writeTransmitter(&link, buffer, length);
 }
 
-int llread(int fd, char *buffer)
+int llread(int fd, u_int8_t *buffer)
 {
     if(fd != link.fd){
         // do something

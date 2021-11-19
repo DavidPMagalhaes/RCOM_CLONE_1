@@ -20,6 +20,7 @@ int openReceiver(struct linkLayer *link)
 int readReceiver(struct linkLayer *link, char *buffer)
 {
     int res, Nr;
+    int disconnecting = 0;
     while (1)
     {
         link->frame.frameUsedSize = 0;
@@ -30,6 +31,7 @@ int readReceiver(struct linkLayer *link, char *buffer)
             DISCMessage(link->frame.frame, A_EM);
             link->frame.frameUsedSize = CMDSZ;
             writeLinkResponse(link);
+            disconnecting = 1;
             continue;
         }
         if (res == -2)
@@ -45,8 +47,16 @@ int readReceiver(struct linkLayer *link, char *buffer)
         }
         if (res == -3)
         {
-            // Received UA after disconnect
-            return 0;
+            if (disconnecting)
+            {
+                // Received UA after disconnect
+                return 0;
+            }
+            else
+            {
+                // Received a random UA. Let's just ignore
+                continue;
+            }
         }
 
         // Read successfully the correct package

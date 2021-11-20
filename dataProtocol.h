@@ -2,8 +2,10 @@
 #define DATAPROTOCOL_H
 
 #include <sys/types.h>
+#include "options.h"
+#include "physicalProtocol.h"
 
-#define MAX_SIZE 255
+struct PHYSICAL_OPTIONS;
 
 typedef enum
 {
@@ -13,7 +15,7 @@ typedef enum
 
 struct frame
 {
-    u_int8_t frame[MAX_SIZE*2 + 5 + 2]; // Trama
+    u_int8_t frame[MAX_BUFFER_SIZE]; // Trama
     // MAX_SIZE is maximum data size. *2 due to the stsuffing. 5 for the commands, 2 for the date proction byte that might need stuffing as well
     int frameUsedSize;
 };
@@ -31,7 +33,7 @@ falha*/
     linkType type;
 };
 
-// void initializeFrame(struct frame *frame);
+int llconfigure(struct PHYSICAL_OPTIONS options);
 
 int llopen(int porta, linkType type);
 

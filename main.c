@@ -6,9 +6,9 @@
 #include <time.h>
 #include <sys/types.h>
 
-
 #include "physicalProtocol.h"
 #include "commandMessages.h"
+#include "options.h"
 
 int main(int argc, char **argv)
 {
@@ -23,7 +23,9 @@ int main(int argc, char **argv)
     int res;
     long test;
     int FER_head, FER_data;
-    struct PHYSICAL_OPTIONS options = CREATE_PHYSICAL_OPTIONS();
+    time_t optionsSeed;
+    optionsSeed = time(NULL);
+    struct PHYSICAL_OPTIONS options = CREATE_PHYSICAL_OPTIONS(optionsSeed);
     char message_5[] = "hello there!";
     char message_7[255];
     int message_7_len = 0;

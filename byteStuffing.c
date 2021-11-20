@@ -79,7 +79,12 @@ int destuff(struct frame *frame, u_int8_t *buffer)
     int nsfCount = 0;
     u_int8_t c, protectionByte = 0;
 
-    for (int i = FIRST_DATA_INDEX; frame->frame[i] != F; i++)
+    if (frame->frame[frame->frameUsedSize - 1] != F)
+    {
+        return -1;
+    }
+
+    for (int i = FIRST_DATA_INDEX; frame->frame[i] != F && nsfCount < MAX_SIZE; i++)
     {
         // if (nsfCount == bufferCapacity)
         // {
@@ -112,13 +117,10 @@ int destuff(struct frame *frame, u_int8_t *buffer)
         }
         nsfCount++;
     }
-
     if (protectionByte != 0) //Data was corrupted
     {
         return -1; //Error: Please resend
     }
-    else // All good
-    {
-        return nsfCount - 1; //-1 because the protection byte that was also in the stuffed sequence doesn't belong to the data
-    }
+
+    return nsfCount - 1; //-1 because the protection byte that was also in the stuffed sequence doesn't belong to the data
 }

@@ -7,6 +7,8 @@
 #include "setFD.h"
 #include "transmitter.h"
 #include "receiver.h"
+#include "options.h"
+#include "physicalProtocol.h"
 
 struct termios oldtio, newtio;
 struct linkLayer link;
@@ -26,6 +28,11 @@ struct linkLayer link;
 //     fflush(stdout);
 // }
 
+int llconfigure(struct PHYSICAL_OPTIONS options)
+{
+    PHYSICAL_PROTOCOL_OPTIONS(options);
+}
+
 int llopen(int porta, linkType type)
 {
     sprintf(link.port, "/dev/ttyS%d", porta);
@@ -33,7 +40,7 @@ int llopen(int porta, linkType type)
     link.type = type;
     link.sequenceNumber = 0;
     link.timeout = 3;
-    link.numTransmissions =3;
+    link.numTransmissions = 3;
     switch (type)
     {
     case TRANSMITTER:
@@ -54,7 +61,8 @@ int llopen(int porta, linkType type)
 
 int llwrite(int fd, u_int8_t *buffer, int length)
 {
-    if(fd != link.fd){
+    if (fd != link.fd)
+    {
         // do something
     }
     return writeTransmitter(&link, buffer, length);
@@ -62,7 +70,8 @@ int llwrite(int fd, u_int8_t *buffer, int length)
 
 int llread(int fd, u_int8_t *buffer)
 {
-    if(fd != link.fd){
+    if (fd != link.fd)
+    {
         // do something
     }
     return readReceiver(&link, buffer);
@@ -74,7 +83,7 @@ int llclose(int fd)
     switch (link.type)
     {
     case TRANSMITTER:
-    printf("closing transmitter\n");
+        // printf("closing transmitter\n");
         res = closeTransmitter(&link);
         break;
     case RECEIVER:

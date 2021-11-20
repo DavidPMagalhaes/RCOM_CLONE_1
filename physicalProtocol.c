@@ -3,56 +3,11 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include "time.h" //For FER
 #include "commandMessages.h"
+#include "options.h"
 
 int flag = 1, count = 0;
 struct PHYSICAL_OPTIONS OPTIONS;
-
-struct PHYSICAL_OPTIONS CREATE_PHYSICAL_OPTIONS()
-{
-    struct PHYSICAL_OPTIONS options = {0, 0, 0, 0};
-    srand(time(NULL));
-    return options;
-}
-
-void
-OPTIONS_GENERATE_FER(struct linkLayer *link)
-{
-    int r;
-    // Errors for head
-    if (OPTIONS.OPTION_FER_HEAD != 0)
-    {
-        for (int i = 1; i <= 3; i++)
-        {
-            // Head is beteeen indices 1 and 3 inclusively
-            r = rand() % OPTIONS.OPTION_FER_HEAD;
-            if (!r)
-            {
-                // 1 in a OPTIONS_FER_DATA chance of being a 0
-                // We will totally switch the byte.
-                link->frame.frame[i] = link->frame.frame[i] ^ 0xff;
-            }
-        }
-    }
-
-    // Errors for data
-    if (OPTIONS.OPTION_FER_DATA != 0)
-    {
-        for (int i = 4; i < link->frame.frameUsedSize - 1; i++)
-        {
-            // Creating errors in the information and bcc2 bytes. Flag is ignored hence -1
-            // Keep in mind we are creating errors in the stuffed message. Simulating errors in transmissions
-            r = rand() % OPTIONS.OPTION_FER_DATA;
-            if (!r)
-            {
-                // 1 in a OPTIONS_FER_DATA chance of being a 0
-                // We will totally switch the byte.
-                link->frame.frame[i] = link->frame.frame[i] ^ 0xff;
-            }
-        }
-    }
-}
 
 void atende() // atende alarme
 {
@@ -200,7 +155,7 @@ int writeLinkInformation(struct linkLayer *link, u_int8_t A)
             else
             {
                 state = WI_START;
-                // Ignore
+                // Ignore, will resend
             }
         }
     }
@@ -247,6 +202,12 @@ int readLinkInformation(struct linkLayer *link, u_int8_t *buffer, u_int8_t A, in
     readInformationState state = RI_START;
     while (1)
     {
+        if(link->frame.frameUsedSize > MAX_BUFFER_SIZE){
+            // For some reason didn't read the end flag or something of the sort. We cannot read anymore
+            // Ask for the packet again without counting as a timeout
+            // Returning 0 because the destuffing will not find a F at the last index and will count as corrupted
+            return 0;
+        }
         res = read(link->fd, &byte, 1);
         if (res == 0)
         {
@@ -266,7 +227,7 @@ int readLinkInformation(struct linkLayer *link, u_int8_t *buffer, u_int8_t A, in
         {
             if (OPTIONS.OPTION_FER)
             {
-                OPTIONS_GENERATE_FER(link);
+                OPTIONS_GENERATE_FER(OPTIONS, link);
                 state = RI_START;
                 for (int i = 0; i < link->frame.frameUsedSize; i++)
                 {

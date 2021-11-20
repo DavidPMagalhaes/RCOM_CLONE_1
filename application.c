@@ -11,41 +11,83 @@
 
 #include "dataProtocol.h"
 #include "commandMessages.h" //printFrame
+#include "options.h"
+#include "time.h"
 
 int main(int argc, char **argv)
 {
     int res;
     int port;
+    int argNo, isReceiver = 1;
+    time_t seed = time(NULL);
+    struct PHYSICAL_OPTIONS options = CREATE_PHYSICAL_OPTIONS(seed);
     if (argc < 2)
     {
-        printf("Call with arguments <port> <filename>\n");
+        printf("Call with arguments <port> <filename> [...options]\n");
         exit(1);
     }
+
+    // Port argument
     errno = 0;
     port = strtol(argv[1], NULL, 10);
     if (errno != 0)
     {
         // The first argument probably wasn't a number
-        printf("Call with arguments <port> <filename>\n");
+        printf("Call with arguments <port> <filename> [...options]\n");
         exit(1);
     }
     if (!(1 || port))
     {
         // Port does not fulfill certain condition
-        printf("Call with arguments <port> <filename> where <port> fulfills <condition>\n");
+        printf("Call with arguments <port> <filename> [...options] where <port> fulfills <condition>\n");
+        exit(1);
     }
-    if (argc == 2)
+
+    for (argNo = 2; argNo < argc; argNo++)
+    {
+        printf("%s\n", argv[argNo]);
+        if (!strcmp(argv[argNo], "-noAlarms"))
+        {
+            printf("-noAlarms enabled\n");
+            options.OPTION_NO_ALARMS = 1;
+        }
+        else if (!strcmp(argv[argNo], "-FER"))
+        {
+            if (argNo + 2 >= argc)
+            {
+                printf("Wrong -FER syntax\n");
+                exit(1);
+            }
+            options.OPTION_FER = 1;
+            options.OPTION_FER_HEAD = (int)strtol(argv[argNo + 1], NULL, 10);
+            options.OPTION_FER_DATA = (int)strtol(argv[argNo + 2], NULL, 10);
+            printf("-FER enabled with head odds %d and data odds %d\n", options.OPTION_FER_HEAD, options.OPTION_FER_DATA);
+            argNo += 2;
+        }
+        else
+        {
+            if (argNo == 2)
+            {
+                isReceiver = 0;
+            }
+            else
+            {
+                // One of the arguments was not a viable option and it wasn't the filename either
+                printf("Call with arguments <port> <filename> [...options] where <port> fulfills <condition>\n");
+                exit(1);
+            }
+        }
+    }
+
+    llconfigure(options);
+
+    if (isReceiver)
     {
         startReceiverProtocol(port);
     }
-    else if (argc == 3)
-    {
-        startTransmitterProtocol(port, argv[2], strlen(argv[2]));
-    }
     else
     {
-        printf("Call with arguments <port> <filename>\n");
-        exit(1);
+        startTransmitterProtocol(port, argv[2], strlen(argv[2]));
     }
 }
 

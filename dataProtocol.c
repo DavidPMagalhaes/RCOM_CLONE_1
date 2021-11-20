@@ -30,12 +30,6 @@ int llopen(int porta, linkType type)
 {
     sprintf(link.port, "/dev/ttyS%d", porta);
     setFD(&link, &oldtio, &newtio);
-    printf("set fd");
-    fflush(stdout);
-    // initializeFrame(&link.frame);
-    printf("initialing frame");
-    fflush(stdout);
-
     link.type = type;
     link.sequenceNumber = 0;
     link.timeout = 3;
@@ -43,18 +37,12 @@ int llopen(int porta, linkType type)
     switch (type)
     {
     case TRANSMITTER:
-        printf("attempting to open transmitter");
-        fflush(stdout);
-
         if (openTransmitter(&link) == 0)
         {
             return link.fd; //emissor.c
         }
         break;
     case RECEIVER:
-        printf("attempting to open receiver");
-        fflush(stdout);
-
         if (openReceiver(&link) == 0)
         {
             return link.fd; //recetor.c
@@ -94,11 +82,11 @@ int llclose(int fd)
         // res = closeReceiver(&link);
         break;
     }
-    if (res != 0)
-    {
-        //What to do if res != 0?
-        return res;
-    }
+    // if (res != 0)
+    // {
+    //     //What to do if res != 0?
+    //     return res;
+    // }
     closeFD(fd, oldtio);
-    return 0;
+    return res;
 }

@@ -61,7 +61,7 @@ int setFD(struct linkLayer *link, struct termios *oldtio, struct termios *newtio
         exit(1);
     }
 
-    printf("New termios structure set\n");
+    // printf("New termios structure set\n");
 
     link->fd = fd;
     return 0;

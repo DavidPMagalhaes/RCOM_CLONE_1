@@ -65,7 +65,6 @@ void startTransmitterProtocol(int port, char *filename, int filenameLen)
     fileSize = st.st_size;
     buf = malloc(fileSize);
     size = read(fd, buf, fileSize);
-    printf("Im here %ld", size);
     printf("\n");
     sendFile(port, buf, size, filename);
     free(buf);
@@ -254,17 +253,23 @@ int saveFile(char *filename, u_int8_t *buf, ssize_t size)
 {
     char *filename2;
     int res;
-    filename2 = malloc(strlen(filename) + 4);
-    snprintf(filename2, 4, "DATA");
-    int fd = open(filename2, O_WRONLY | O_TRUNC);
-    free(filename2);
+    int filename2size = strlen(filename) + 4 + 1;
+    filename2 = malloc(filename2size);
+    sprintf(filename2, "DATA%s", filename);
+
+    int fd = open(filename2, O_WRONLY | O_TRUNC | O_CREAT);
+    if (fd == -1)
+    {
+        // printf("%d", errno);
+        printf("Receiver: Unable to open output file\n");
+    }
+    // free(filename2);
     res = write(fd, buf, size);
     if (res == -1)
     {
         printf("Receiver: Error writing to file\n");
         exit(1);
     }
-    // writeFrames(fd, buf, size, filename); // I think this is totally wrong
     return 0;
 }
 
@@ -422,8 +427,7 @@ void readInformationFrame(u_int8_t *buf, ssize_t *bufIndex, u_int8_t *frameBuf, 
     u_int8_t seqNo = frameBuf[1];
     u_int16_t datasize;
     memcpy(&datasize, frameBuf + 2, 2);
-    printf("DAtasize: %d", datasize); // Debug
-    if (seqNo == (*seq) + 1)
+    if (seqNo == (*seq))
     {
         // We are getting the subsequent data and there are no problems
         (*seq) = ((*seq) + 1) % 256;

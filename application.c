@@ -78,7 +78,7 @@ void startReceiverProtocol(int port)
     u_int8_t *buf;
     char *filename;
     ssize_t size;
-    res = readFile(port, buf, &size, filename);
+    res = readFile(port, &buf, &size, &filename);
     if (res != 0)
     {
         // Error
@@ -86,7 +86,7 @@ void startReceiverProtocol(int port)
     }
     // TODO
     // Add a prefix to the filename
-    res = writeFile(filename, buf, size);
+    res = saveFile(filename, buf, size);
     if (res != 0)
     {
         // Error
@@ -109,39 +109,10 @@ void sendFile(int port, u_int8_t *buf, ssize_t size, char *filename)
     writeFrames(fd, buf, size, filename);
 
     res = llclose(fd);
-    if(res != 0){
+    if (res != 0)
+    {
         printf("Transmitter: Couldn't inform receiver to close connection. Manual action may be necessary\n");
     }
-
-}
-
-int readFile(int port, u_int8_t *buf, ssize_t *size, char *filename)
-{
-    // Don't forget to allocate space for filename
-    linkType linkType = RECEIVER;
-    int fd = llopen(port, linkType);
-    if (fd == -1)
-    {
-        printf("Receiver: Error establishing connection\n");
-        exit(1);
-    }
-
-    readFrames(fd, buf, size, filename);
-    return 0;
-}
-
-int writeFile(char *filename, u_int8_t *buf, ssize_t size)
-{
-    int res;
-    int fd = open(filename, O_WRONLY | O_TRUNC);
-    res = write(fd, buf, size);
-    if (res == -1)
-    {
-        printf("Receiver: Error writing to file\n");
-        exit(1);
-    }
-    writeFrames(fd, buf, size, filename);
-    return 0;
 }
 
 void writeFrames(int fd, u_int8_t *buf, ssize_t size, char *filename)
@@ -149,7 +120,7 @@ void writeFrames(int fd, u_int8_t *buf, ssize_t size, char *filename)
 
     // What if the filename is 255 bytes long. Then the control frame won't have enoug bytes.
     // The data packets depends on the buffer size of the link layer, though.
-    // So, should I make the link layer have a buffer long enough for a 255 bytes filename plus the others parameters?
+    // So, should jmake the link layer have a buffer long enough for a 255 bytes filename plus the others parameters?
     // What if I had more parameters. Would I change the link frame size then
     // Ask the teacher what I should do in this case.
 
@@ -170,24 +141,6 @@ void writeFrames(int fd, u_int8_t *buf, ssize_t size, char *filename)
     free(controlBuf);
 }
 
-void writeFrame(int fd, u_int8_t *buf, int size)
-{
-    // We assume size is enough to fit in the frame buffer
-    int res = llwrite(fd, buf, size);
-    if (res == -1)
-    {
-        // Time out
-        printf("Transmitter: The receiver timed out\n");
-        exit(1);
-    }
-    if (res != size)
-    {
-        // Different number of bytes was written for some reason
-        printf("Transmitter: Couldn't write full packet\n");
-        exit(1);
-    }
-}
-
 void writeInformationFrames(int fd, u_int8_t *buf, ssize_t size)
 {
     u_int8_t frameBuf[LINK_LAYER_BUFFER_SIZE];
@@ -195,7 +148,7 @@ void writeInformationFrames(int fd, u_int8_t *buf, ssize_t size)
     u_int16_t packetDataSize;
     u_int8_t packetSeq = 0;
     ssize_t bufIndex = 0;
-    int i =0;
+    int i = 0;
     while (bufIndex < size)
     {
         if (bufIndex + datasize > size)
@@ -264,6 +217,226 @@ void assembleInformationFrame(u_int8_t *buf, ssize_t bufIndex, u_int8_t *frameBu
     // datasize is not the size of the frameBuf. Assembling is guaranteed not to exceed framebuf size
 }
 
-void readFrames(int fd, u_int8_t *buf, ssize_t *size, char *filename)
+void writeFrame(int fd, u_int8_t *buf, int size)
 {
+    // We assume size is enough to fit in the frame buffer
+    int res = llwrite(fd, buf, size);
+    if (res == -1)
+    {
+        // Time out
+        printf("Transmitter: The receiver timed out\n");
+        exit(1);
+    }
+    if (res != size)
+    {
+        // Different number of bytes was written for some reason
+        printf("Transmitter: Couldn't write full packet\n");
+        exit(1);
+    }
+}
+
+int readFile(int port, u_int8_t **buf, ssize_t *size, char **filename)
+{
+    // Don't forget to allocate space for filename
+    linkType linkType = RECEIVER;
+    int fd = llopen(port, linkType);
+    if (fd == -1)
+    {
+        printf("Receiver: Error establishing connection\n");
+        exit(1);
+    }
+
+    readFrames(fd, buf, size, filename);
+    return 0;
+}
+
+int saveFile(char *filename, u_int8_t *buf, ssize_t size)
+{
+    char *filename2;
+    int res;
+    filename2 = malloc(strlen(filename) + 4);
+    snprintf(filename2, 4, "DATA");
+    int fd = open(filename2, O_WRONLY | O_TRUNC);
+    free(filename2);
+    res = write(fd, buf, size);
+    if (res == -1)
+    {
+        printf("Receiver: Error writing to file\n");
+        exit(1);
+    }
+    // writeFrames(fd, buf, size, filename); // I think this is totally wrong
+    return 0;
+}
+
+void readFrames(int fd, u_int8_t **buf, ssize_t *size, char **filename)
+{
+    int res;
+    int start = 0, end = 0, expecting_end = 0;
+    u_int8_t control;
+    u_int8_t frameBuf[LINK_LAYER_BUFFER_SIZE], frameBufStart[LINK_LAYER_BUFFER_SIZE];
+    int controlPacketSize = 0;
+    ssize_t bufIndex = 0;
+    u_int8_t seq = 0;
+
+    while (1)
+    {
+        res = llread(fd, frameBuf);
+
+        if (res == 0)
+        {
+            if (start && !end)
+            {
+                // We received a disconnection message without having received the full file
+                printf("Receiver: Disconnection before operation concluded\n");
+                exit(1);
+            }
+            else if (start && end)
+            {
+                // Disconnect request successfully received
+                return;
+            }
+            else if (!start && !end)
+            {
+                printf("Receiver: No file received. Exiting\n");
+                return;
+            }
+            else if (!start && end)
+            {
+                // Something very wrong happened
+                printf("Receiver: Unexpected behaviour detected. Exiting\n");
+                exit(1);
+            }
+        }
+
+        control = frameBuf[0];
+        switch (control)
+        {
+        case 1:
+            if (expecting_end)
+            {
+                // Too many safety measures?
+                printf("Receiver: No more information packets expected\n");
+                exit(1);
+            }
+
+            // Information packet
+            readInformationFrame(*buf, &bufIndex, frameBuf, &seq);
+            if (bufIndex == *size)
+            {
+                expecting_end = 1;
+            }
+            break;
+        case 2:
+            // Start packet
+            if (expecting_end)
+            {
+                // Too many safety measures?
+                printf("Receiver: No more information packets expected\n");
+                exit(1);
+            }
+            if (start)
+            {
+                printf("Receiver: Restarting package reception\n");
+                end = 0;
+                bufIndex = 0;
+                expecting_end = 0;
+                seq = 0;
+            }
+            controlPacketSize = readControlFrame(frameBuf, filename, size);
+            (*buf) = malloc(*size);
+            memcpy(frameBufStart, frameBuf, controlPacketSize);
+            start = 1;
+            break;
+        case 3:
+            // End packet
+            if (!start)
+            {
+                // Something very wrong happened
+                printf("Receiver: Unexpected behaviour detected. Exiting\n");
+                exit(1);
+            }
+            if (!expecting_end)
+            {
+                // Too many safety measures?
+
+                // This might actually be a feasible scenario where the last information packet is delayed. What should I do in this case.
+                // We should have a windowBuf[256][255] to implement the sliding window mechanism perhaps
+                // Talk to the teacher TODO
+                printf("Receiver: Not expecting end packet\n");
+                exit(1);
+            }
+            // Compare frameBuf to frameBufStart to see if the information is the same
+            frameBuf[0] = 0;
+            frameBufStart[0] = 0;
+            if (memcmp(frameBuf, frameBufStart, controlPacketSize) != 0)
+            {
+                printf("Receiver: Start and end control packet are not matching\n");
+                exit(1);
+            }
+            end = 1;
+            break;
+
+        default:
+            printf("Receiver: Invalid control packet %02x\n", control);
+            exit(1);
+        }
+    }
+}
+
+int readControlFrame(u_int8_t *buf, char **filename, ssize_t *filesize)
+{
+    // Byte 0 is already verified to be 2 or 3
+    int i = 1;
+    u_int8_t param, bytes;
+
+    for (int j = 0; j < NUM_CONTROL_PARAMS; j++)
+    {
+        param = buf[i];
+        i++;
+        bytes = buf[i];
+        i++;
+        switch (param)
+        {
+        case 0:
+            // fileSize
+            memcpy(filesize, (buf + i), bytes);
+            break;
+        case 1:
+            // filename
+            (*filename) = malloc(bytes);
+            memcpy(*filename, (buf + i), bytes);
+            break;
+        default:
+            break;
+        }
+        i += bytes;
+    }
+    return i;
+}
+
+void readInformationFrame(u_int8_t *buf, ssize_t *bufIndex, u_int8_t *frameBuf, u_int8_t *seq)
+{
+    // Byte 0 is already verified to be 1
+    // How to deal with wrong sequence numbers?
+    // Do I need to put them in the right place and the lowest received till now is my bufIndex?
+    u_int8_t seqNo = frameBuf[1];
+    u_int16_t datasize;
+    memcpy(&datasize, frameBuf + 2, 2);
+    printf("DAtasize: %d", datasize); // Debug
+    if (seqNo == (*seq) + 1)
+    {
+        // We are getting the subsequent data and there are no problems
+        (*seq) = ((*seq) + 1) % 256;
+        memcpy(buf + (*bufIndex), frameBuf + INFORMATION_PACKET_HEAD_SIZE, datasize);
+        (*bufIndex) += datasize;
+    }
+    else
+    {
+        // TODO
+        // See with the teacher what is the right approach here!!!
+        // Works as a sort of sliding window. Need to put the bytes in the right places
+        printf("Receiver: Incorrect data packet sequence order. Ask the developer to implement safety mechanisms\n");
+        exit(1);
+    }
+    return;
 }

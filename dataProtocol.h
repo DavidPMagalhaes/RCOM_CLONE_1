@@ -12,6 +12,7 @@ typedef enum
     TRANSMITTER
 } linkType;
 
+// TODO ADD timeout and numTransmissions to command line arguments
 struct frame
 {
     u_int8_t frame[MAX_SIZE * 2 + 5 + 2]; // Trama

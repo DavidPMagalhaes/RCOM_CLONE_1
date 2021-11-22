@@ -282,7 +282,7 @@ int saveFile(char *filename, u_int8_t *buf, ssize_t size)
         // printf("%d", errno);
         printf("Receiver: Unable to open output file\n");
     }
-    // free(filename2);
+    free(filename2);
     res = write(fd, buf, size);
     if (res == -1)
     {

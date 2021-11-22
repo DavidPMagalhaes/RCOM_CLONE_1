@@ -4,6 +4,7 @@
 #include <sys/types.h>
 
 #define MAX_SIZE 255
+#define MAX_BUFFER_SIZE MAX_SIZE * 2 + 5 + 2
 
 typedef enum
 {
@@ -13,7 +14,7 @@ typedef enum
 
 struct frame
 {
-    u_int8_t frame[MAX_SIZE*2 + 5 + 2]; // Trama
+    u_int8_t frame[MAX_SIZE * 2 + 5 + 2]; // Trama
     // MAX_SIZE is maximum data size. *2 due to the stsuffing. 5 for the commands, 2 for the date proction byte that might need stuffing as well
     int frameUsedSize;
 };

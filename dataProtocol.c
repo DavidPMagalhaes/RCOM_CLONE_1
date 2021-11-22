@@ -11,21 +11,6 @@
 struct termios oldtio, newtio;
 struct linkLayer link;
 
-// void initializeFrame(struct frame *frame)
-// {
-//     printf("initializing frame inside");
-//     fflush(stdout);
-//     u_int8_t *newFrame = (u_int8_t *)malloc(MAX_SIZE);
-//     printf("mem alloc");
-//     fflush(stdout);
-//     frame->frameSize = MAX_SIZE;
-//     frame->stuffedFrame = newFrame;
-//     frame->stuffedFrameSize = MAX_SIZE;
-//     frame->stuffedFrameUsedSize = 0;
-//     printf("done alloc");
-//     fflush(stdout);
-// }
-
 int llopen(int porta, linkType type)
 {
     sprintf(link.port, "/dev/ttyS%d", porta);

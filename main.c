@@ -6,9 +6,9 @@
 #include <time.h>
 #include <sys/types.h>
 
-
 #include "physicalProtocol.h"
 #include "commandMessages.h"
+#include "options.h"
 
 int main(int argc, char **argv)
 {
@@ -23,7 +23,9 @@ int main(int argc, char **argv)
     int res;
     long test;
     int FER_head, FER_data;
-    struct PHYSICAL_OPTIONS options = CREATE_PHYSICAL_OPTIONS();
+    time_t seed = time(NULL);
+    seed = 1234465;
+    printf("%ld\n", seed);
     char message_5[] = "hello there!";
     char message_7[255];
     int message_7_len = 0;
@@ -39,30 +41,8 @@ int main(int argc, char **argv)
     else
     {
         test = strtol(argv[1], NULL, 10);
-        for (int i = 2; i < argc; i++)
-        {
-            printf("%s\n", argv[i]);
-            if (!strcmp(argv[i], "-noAlarms"))
-            {
-                printf("-noAlarms enabled\n");
-                options.OPTION_NO_ALARMS = 1;
-            }
-            else if (!strcmp(argv[i], "-FER"))
-            {
-                if (i + 2 >= argc)
-                {
-                    printf("Wrong -FER syntax\n");
-                    exit(1);
-                }
-                options.OPTION_FER = 1;
-                options.OPTION_FER_HEAD = (int)strtol(argv[i + 1], NULL, 10);
-                options.OPTION_FER_DATA = (int)strtol(argv[i + 2], NULL, 10);
-                printf("-FER enabled with head odds %d and data odds %d\n", options.OPTION_FER_HEAD, options.OPTION_FER_DATA);
-                i += 2;
-            }
-        }
     }
-    PHYSICAL_PROTOCOL_OPTIONS(options);
+    CREATE_OPTIONS(argc, argv, seed);
     switch (test)
     {
     case 1:

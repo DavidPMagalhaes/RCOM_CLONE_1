@@ -8,17 +8,22 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <time.h>
 
 #include "dataProtocol.h"
 #include "commandMessages.h" //printFrame
+#include "options.h"
 
 int main(int argc, char **argv)
 {
     int res;
     int port;
+    int argNo;
+    time_t seed = time(NULL);
+    CREATE_OPTIONS(argc, argv, seed);
     if (argc < 2)
     {
-        printf("Call with arguments <port> <filename>\n");
+        printf("Call with arguments <port> <filename> [...options] \n");
         exit(1);
     }
     errno = 0;
@@ -26,25 +31,39 @@ int main(int argc, char **argv)
     if (errno != 0)
     {
         // The first argument probably wasn't a number
-        printf("Call with arguments <port> <filename>\n");
+        printf("Call with arguments <port> <filename> [...options] \n");
         exit(1);
     }
     if (!(1 || port))
     {
         // Port does not fulfill certain condition
-        printf("Call with arguments <port> <filename> where <port> fulfills <condition>\n");
+        printf("Call with arguments <port> <filename> [...options]  where <port> fulfills <condition>\n");
+        exit(1);
     }
-    if (argc == 2)
+
+    for (argNo = 2; argNo < argc; argNo++)
     {
+        // Starts in 2 because we already got the port. Only need the files or options now
+        if (OPTION_IS_FLAG(argv[argNo]))
+        {
+            break;
+        }
+    }
+
+    if (argNo == 2)
+    {
+        // There was only one argument and the rest was flags or reached the end of the arguments
         startReceiverProtocol(port);
     }
-    else if (argc == 3)
+    else if (argNo == 3)
     {
+        // There was two arguments and the rest was flags or reached the end of the arguments
         startTransmitterProtocol(port, argv[2], strlen(argv[2]));
     }
     else
     {
-        printf("Call with arguments <port> <filename>\n");
+        // There was more than two arguments before finding a flag or reaching the end of the arguments
+        printf("Call with arguments <port> <filename> [...options] \n");
         exit(1);
     }
 }

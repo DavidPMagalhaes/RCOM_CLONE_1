@@ -3,20 +3,6 @@
 
 #include "dataProtocol.h"
 
-struct PHYSICAL_OPTIONS
-{
-    int OPTION_NO_ALARMS;
-    int OPTION_FER;
-    int OPTION_FER_HEAD;
-    int OPTION_FER_DATA;
-};
-
-struct PHYSICAL_OPTIONS CREATE_PHYSICAL_OPTIONS();
-
-void PHYSICAL_PROTOCOL_OPTIONS(struct PHYSICAL_OPTIONS cmd_options);
-
-void OPTIONS_GENERATE_FER(struct linkLayer *link);
-
 typedef enum
 {
     START,

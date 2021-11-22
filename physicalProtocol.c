@@ -3,71 +3,20 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include "time.h" //For FER
+
 #include "commandMessages.h"
+#include "options.h"
 
 int flag = 1, count = 0;
-struct PHYSICAL_OPTIONS OPTIONS;
-
-struct PHYSICAL_OPTIONS CREATE_PHYSICAL_OPTIONS()
-{
-    struct PHYSICAL_OPTIONS options = {0, 0, 0, 0};
-    srand(time(NULL));
-    return options;
-}
-
-void
-OPTIONS_GENERATE_FER(struct linkLayer *link)
-{
-    int r;
-    // Errors for head
-    if (OPTIONS.OPTION_FER_HEAD != 0)
-    {
-        for (int i = 1; i <= 3; i++)
-        {
-            // Head is beteeen indices 1 and 3 inclusively
-            r = rand() % OPTIONS.OPTION_FER_HEAD;
-            if (!r)
-            {
-                // 1 in a OPTIONS_FER_DATA chance of being a 0
-                // We will totally switch the byte.
-                link->frame.frame[i] = link->frame.frame[i] ^ 0xff;
-            }
-        }
-    }
-
-    // Errors for data
-    if (OPTIONS.OPTION_FER_DATA != 0)
-    {
-        for (int i = 4; i < link->frame.frameUsedSize - 1; i++)
-        {
-            // Creating errors in the information and bcc2 bytes. Flag is ignored hence -1
-            // Keep in mind we are creating errors in the stuffed message. Simulating errors in transmissions
-            r = rand() % OPTIONS.OPTION_FER_DATA;
-            if (!r)
-            {
-                // 1 in a OPTIONS_FER_DATA chance of being a 0
-                // We will totally switch the byte.
-                link->frame.frame[i] = link->frame.frame[i] ^ 0xff;
-            }
-        }
-    }
-}
 
 void atende() // atende alarme
 {
-    if (OPTIONS.OPTION_NO_ALARMS)
+    if (OPTIONS_ALARM())
     {
-        return;
+        printf("Alarme #%d\n", count);
+        flag = 1;
+        count++;
     }
-    printf("Alarme #%d\n", count);
-    flag = 1;
-    count++;
-}
-
-void PHYSICAL_PROTOCOL_OPTIONS(struct PHYSICAL_OPTIONS cmd_options)
-{
-    OPTIONS = cmd_options;
 }
 
 void writeLinkResponse(struct linkLayer *link)
@@ -199,8 +148,10 @@ int writeLinkInformation(struct linkLayer *link, u_int8_t A)
             }
             else
             {
+                // Duplicate or some other situation. Receiver is asking for resend
+                // Approach is to ignore, and timeout will take care of it.
+                // Alternatively, we could do the same as when it is rejected with the current sequence number
                 state = WI_START;
-                // Ignore
             }
         }
     }
@@ -209,8 +160,6 @@ int writeLinkInformation(struct linkLayer *link, u_int8_t A)
 
 int readLinkCommand(struct linkLayer *link, u_int8_t A, u_int8_t C)
 {
-    // printf("reading link command");
-    fflush(stdout);
     int res;
     struct frame frame = link->frame;
     u_int8_t byte;
@@ -239,8 +188,6 @@ int readLinkCommand(struct linkLayer *link, u_int8_t A, u_int8_t C)
 
 int readLinkInformation(struct linkLayer *link, u_int8_t *buffer, u_int8_t A, int *Nr)
 {
-    // printf("reading link command");
-    fflush(stdout);
     int res;
     struct frame frame = link->frame;
     u_int8_t byte;
@@ -257,24 +204,20 @@ int readLinkInformation(struct linkLayer *link, u_int8_t *buffer, u_int8_t A, in
             printf("Fd reading error \n");
             exit(1);
         }
+        if (link->frame.frameUsedSize == MAX_BUFFER_SIZE)
+        {
+            // Something very wrong went on. Let's just reask for this package
+            return -2;
+        }
         link->frame.frame[link->frame.frameUsedSize] = byte;
         link->frame.frameUsedSize++;
         state = readInformationStateMachine(state, A, byte, Nr);
 
-        // Enforcing FER Generation will reprocess the head after errors might have been added to it
-        if (state == RI_INFORMATION_STOP)
-        {
-            if (OPTIONS.OPTION_FER)
-            {
-                OPTIONS_GENERATE_FER(link);
-                state = RI_START;
-                for (int i = 0; i < link->frame.frameUsedSize; i++)
-                {
-                    byte = link->frame.frame[i];
-                    state = readInformationStateMachine(state, A, byte, Nr);
-                }
-            }
-        }
+        // Generating erors. Must always come after the readInformationStateMachine line
+        // This strategy is awful and we should simulate the error right after we receive the byte
+        // Check with the teacher TODO
+        OPTIONS_GENERATE_FER(link, &state, A, Nr);
+
         if (state == RI_INFORMATION_STOP)
         {
 
@@ -541,5 +484,8 @@ int readInformationStateMachine(readInformationState state, u_int8_t A, u_int8_t
             return RI_INFORMATION_STOP;
         }
         return RI_INFORMATION_READ;
+
+    default:
+        return RI_START;
     }
 }

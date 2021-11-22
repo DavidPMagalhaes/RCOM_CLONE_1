@@ -56,7 +56,6 @@ OPTIONS_GENERATE_FER(struct linkLayer *link)
 
 void atende() // atende alarme
 {
-    return; //Debug
     if (OPTIONS.OPTION_NO_ALARMS)
     {
         return;

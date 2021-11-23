@@ -16,7 +16,12 @@
 
 
 // TODO
+
+// 1
 // Do I not clean dinammically allocated memory on an exit(1)? Should I
+
+// 2
+// The receiver part of the application cannot complain if something higher level is wrong. Is that supposed to be the way?
 int main(int argc, char **argv)
 {
     int res;

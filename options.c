@@ -3,7 +3,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include <time.h>             //For FER
+#include <time.h> //For FER
+#include <errno.h>
+#include <unistd.h>
 #include "dataProtocol.h"     // for linkLayer
 #include "physicalProtocol.h" // for readInformationState
 
@@ -11,6 +13,7 @@ struct PHYSICAL_OPTIONS OPTIONS;
 
 void CREATE_OPTIONS(int argc, char **argv, time_t seed)
 {
+    errno = 0;
     int flags_started = 0;
     for (int i = 2; i < argc; i++)
     {
@@ -30,9 +33,32 @@ void CREATE_OPTIONS(int argc, char **argv, time_t seed)
             OPTIONS.OPTION_FER = 1;
             OPTIONS.OPTION_FER_HEAD = (int)strtol(argv[i + 1], NULL, 10);
             OPTIONS.OPTION_FER_DATA = (int)strtol(argv[i + 2], NULL, 10);
+            if (errno != 0)
+            {
+                printf("Passed a wrong value for -FER argument\n");
+                exit(1);
+            }
             i += 2;
             flags_started = 1;
             printf("-FER enabled with head odds %d and data odds %d\n", OPTIONS.OPTION_FER_HEAD, OPTIONS.OPTION_FER_DATA);
+        }
+        else if (!strcmp(argv[i], "-TPROP"))
+        {
+            if (i + 1 >= argc)
+            {
+                printf("Wrong -TPROP syntax\n");
+                exit(1);
+            }
+            OPTIONS.OPTION_TPROP = 1;
+            OPTIONS.OPTION_TPROP_MS = (int)strtol(argv[i + 1], NULL, 10);
+            if (errno != 0)
+            {
+                printf("Passed a wrong value for -TPROP argument\n");
+                exit(1);
+            }
+            i += 1;
+            flags_started = 1;
+            printf("-TPROP enabled with %d ms", OPTIONS.OPTION_TPROP_MS);
         }
         else
         {
@@ -55,6 +81,10 @@ int OPTION_IS_FLAG(char *arg)
     else if (!strcmp(arg, "-FER"))
     {
         return 2;
+    }
+    else if (!strcmp(arg, "-TPROP"))
+    {
+        return 3;
     }
     return 0;
 }
@@ -131,4 +161,12 @@ void OPTIONS_GENERATE_FER(struct linkLayer *link, readInformationState *state, u
 int OPTIONS_ALARM()
 {
     return (!OPTIONS.OPTION_NO_ALARMS);
+}
+
+void OPTIONS_TPROP()
+{
+    if (OPTIONS.OPTION_TPROP)
+    {
+        usleep(OPTIONS.OPTION_TPROP_MS * 1000);
+    }
 }

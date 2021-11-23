@@ -2,7 +2,8 @@
     "files.associations": {
         "stdio.h": "c",
         "options.h": "c",
-        "dataprotocol.h": "c"
+        "dataprotocol.h": "c",
+        "transmitter.h": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }

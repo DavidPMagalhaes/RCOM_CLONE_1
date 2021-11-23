@@ -45,18 +45,15 @@ int writeLinkCommand(struct linkLayer *link, u_int8_t A, u_int8_t C)
     {
         if (flag)
         {
+            alarm(link->timeout);
+            OPTIONS_TPROP();
             res = write(link->fd, frame.frame, link->frame.frameUsedSize);
-            // TODO add propagation time.
-            // alarm(link->timeout);
-            // OPTIONS_TPROP();
-            // res = write(link->fd, frame.frame, link->frame.frameUsedSize);
 
             if (res == -1)
             {
                 printf("Fd writing error\n");
                 exit(1);
             }
-            alarm(link->timeout);
             flag = 0;
         }
 
@@ -97,13 +94,15 @@ int writeLinkInformation(struct linkLayer *link, u_int8_t A)
     {
         if (flag)
         {
+            alarm(link->timeout);
+            OPTIONS_TPROP();
             res = write(link->fd, frame.frame, link->frame.frameUsedSize);
+
             if (res == -1)
             {
                 printf("Fd writing error\n");
                 exit(1);
             }
-            alarm(link->timeout);
             flag = 0;
         }
 

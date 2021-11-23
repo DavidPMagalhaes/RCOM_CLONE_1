@@ -14,8 +14,6 @@
             "cwd": "${workspaceFolder}",
             "miDebuggerPath": "/usr/bin/gdb",
             "stopAtConnect": true
-            // "miDebuggerPath": "C:\\Program Files (x86)\\mingw-w64\\i686-8.1.0-posix-dwarf-rt_v6-rev0\\mingw32\\bin\\gdb"
-
         },
         {
             "name": "Application Transmitter",
@@ -27,8 +25,17 @@
             "cwd": "${workspaceFolder}",
             "miDebuggerPath": "/usr/bin/gdb",
             "stopAtConnect": true
-            // "miDebuggerPath": "C:\\Program Files (x86)\\mingw-w64\\i686-8.1.0-posix-dwarf-rt_v6-rev0\\mingw32\\bin\\gdb"
-
+        },       
+        {
+            "name": "Transmitter TPROP 500ms",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/main.exe",
+            "args": ["8", "-TPROP", "500"],
+            "environment": [{ "name": "config", "value": "Debug" }],
+            "cwd": "${workspaceFolder}",
+            "miDebuggerPath": "/usr/bin/gdb",
+            "stopAtConnect": true
         },
         {
             "name": "Receiver HEAD_FER Message Bytes",
@@ -40,8 +47,6 @@
             "cwd": "${workspaceFolder}",
             "miDebuggerPath": "/usr/bin/gdb",
             "stopAtConnect": true
-            // "miDebuggerPath": "C:\\Program Files (x86)\\mingw-w64\\i686-8.1.0-posix-dwarf-rt_v6-rev0\\mingw32\\bin\\gdb"
-
         },
         {
             "name": "Receiver DATA_FER Message Bytes",
@@ -53,8 +58,6 @@
             "cwd": "${workspaceFolder}",
             "miDebuggerPath": "/usr/bin/gdb",
             "stopAtConnect": true
-            // "miDebuggerPath": "C:\\Program Files (x86)\\mingw-w64\\i686-8.1.0-posix-dwarf-rt_v6-rev0\\mingw32\\bin\\gdb"
-
         },
         {
             "name": "Transmitter Random Messages Alarms",
@@ -66,8 +69,6 @@
             "cwd": "${workspaceFolder}",
             "miDebuggerPath": "/usr/bin/gdb",
             "stopAtConnect": true
-            // "miDebuggerPath": "C:\\Program Files (x86)\\mingw-w64\\i686-8.1.0-posix-dwarf-rt_v6-rev0\\mingw32\\bin\\gdb"
-
         },
         {
             "name": "Transmitter Random Messages",
@@ -79,8 +80,6 @@
             "cwd": "${workspaceFolder}",
             "miDebuggerPath": "/usr/bin/gdb",
             "stopAtConnect": true
-            // "miDebuggerPath": "C:\\Program Files (x86)\\mingw-w64\\i686-8.1.0-posix-dwarf-rt_v6-rev0\\mingw32\\bin\\gdb"
-
         },
         {
             "name": "Transmitter Message Special chars",
@@ -92,8 +91,6 @@
             "cwd": "${workspaceFolder}",
             "miDebuggerPath": "/usr/bin/gdb",
             "stopAtConnect": true
-            // "miDebuggerPath": "C:\\Program Files (x86)\\mingw-w64\\i686-8.1.0-posix-dwarf-rt_v6-rev0\\mingw32\\bin\\gdb"
-
         },
         {
             "name": "Receiver Message Bytes",
@@ -105,8 +102,6 @@
             "cwd": "${workspaceFolder}",
             "miDebuggerPath": "/usr/bin/gdb",
             "stopAtConnect": true
-            // "miDebuggerPath": "C:\\Program Files (x86)\\mingw-w64\\i686-8.1.0-posix-dwarf-rt_v6-rev0\\mingw32\\bin\\gdb"
-
         },
         {
             "name": "Receiver Message",
@@ -118,8 +113,6 @@
             "cwd": "${workspaceFolder}",
             "miDebuggerPath": "/usr/bin/gdb",
             "stopAtConnect": true
-            // "miDebuggerPath": "C:\\Program Files (x86)\\mingw-w64\\i686-8.1.0-posix-dwarf-rt_v6-rev0\\mingw32\\bin\\gdb"
-
         },
         {
             "name": "Transmitter Message",
@@ -131,8 +124,6 @@
             "cwd": "${workspaceFolder}",
             "miDebuggerPath": "/usr/bin/gdb",
             "stopAtConnect": true
-            // "miDebuggerPath": "C:\\Program Files (x86)\\mingw-w64\\i686-8.1.0-posix-dwarf-rt_v6-rev0\\mingw32\\bin\\gdb"
-
         },
         {
             "name": "Receiver",
@@ -144,8 +135,6 @@
             "cwd": "${workspaceFolder}",
             "miDebuggerPath": "/usr/bin/gdb",
             "stopAtConnect": true
-            // "miDebuggerPath": "C:\\Program Files (x86)\\mingw-w64\\i686-8.1.0-posix-dwarf-rt_v6-rev0\\mingw32\\bin\\gdb"
-
         },
         {
             "name": "Transmitter",
@@ -157,8 +146,6 @@
             "cwd": "${workspaceFolder}",
             "miDebuggerPath": "/usr/bin/gdb",
             "stopAtConnect": true
-            // "miDebuggerPath": "C:\\Program Files (x86)\\mingw-w64\\i686-8.1.0-posix-dwarf-rt_v6-rev0\\mingw32\\bin\\gdb"
-
         }
     ]
 }

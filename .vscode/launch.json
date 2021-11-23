@@ -25,7 +25,18 @@
             "cwd": "${workspaceFolder}",
             "miDebuggerPath": "/usr/bin/gdb",
             "stopAtConnect": true
-        },       
+        },      
+        {
+            "name": "Transmitter PACKETLOSS 5",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/main.exe",
+            "args": ["8", "-PACKETLOSS", "5"],
+            "environment": [{ "name": "config", "value": "Debug" }],
+            "cwd": "${workspaceFolder}",
+            "miDebuggerPath": "/usr/bin/gdb",
+            "stopAtConnect": true
+        }, 
         {
             "name": "Transmitter TPROP 500ms",
             "type": "cppdbg",

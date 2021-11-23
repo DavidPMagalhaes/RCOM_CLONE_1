@@ -60,6 +60,24 @@ void CREATE_OPTIONS(int argc, char **argv, time_t seed)
             flags_started = 1;
             printf("-TPROP enabled with %d ms", OPTIONS.OPTION_TPROP_MS);
         }
+        else if (!strcmp(argv[i], "-PACKETLOSS"))
+        {
+            if (i + 1 >= argc)
+            {
+                printf("Wrong -PACKETLOSS syntax\n");
+                exit(1);
+            }
+            OPTIONS.OPTIONS_PACKET_LOSS = 1;
+            OPTIONS.OPTIONS_PACKET_LOSS_ODD = (int)strtol(argv[i + 1], NULL, 10);
+            if (errno != 0)
+            {
+                printf("Passed a wrong value for -PACKETLOSS argument\n");
+                exit(1);
+            }
+            i += 1;
+            flags_started = 1;
+            printf("-PACKETLOSS enabled with %d odd", OPTIONS.OPTIONS_PACKET_LOSS_ODD);
+        }
         else
         {
             if (flags_started)
@@ -85,6 +103,10 @@ int OPTION_IS_FLAG(char *arg)
     else if (!strcmp(arg, "-TPROP"))
     {
         return 3;
+    }
+    else if (!strcmp(arg, "-PACKETLOSS"))
+    {
+        return 4;
     }
     return 0;
 }
@@ -169,4 +191,13 @@ void OPTIONS_TPROP()
     {
         usleep(OPTIONS.OPTION_TPROP_MS * 1000);
     }
+}
+
+int OPTIONS_PACKET_LOSS()
+{
+    if (OPTIONS.OPTIONS_PACKET_LOSS)
+    {
+        return (rand() % OPTIONS.OPTIONS_PACKET_LOSS_ODD) == 0;
+    }
+    return 0;
 }

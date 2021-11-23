@@ -19,11 +19,20 @@ void atende() // atende alarme
     }
 }
 
+int FdWrite(int fd, void *buf, size_t count)
+{
+    if (OPTIONS_PACKET_LOSS())
+    {
+        return count; // Returns count because, as far as the transmitter knows, it was successful
+    }
+    return write(fd, buf, count);
+}
+
 void writeLinkResponse(struct linkLayer *link)
 {
     int res;
     struct frame frame = link->frame;
-    res = write(link->fd, frame.frame, frame.frameUsedSize);
+    res = FdWrite(link->fd, frame.frame, frame.frameUsedSize);
     if (res == -1)
     {
         printf("Fd writing error\n");
@@ -47,7 +56,7 @@ int writeLinkCommand(struct linkLayer *link, u_int8_t A, u_int8_t C)
         {
             alarm(link->timeout);
             OPTIONS_TPROP();
-            res = write(link->fd, frame.frame, link->frame.frameUsedSize);
+            res = FdWrite(link->fd, frame.frame, link->frame.frameUsedSize);
 
             if (res == -1)
             {
@@ -96,7 +105,7 @@ int writeLinkInformation(struct linkLayer *link, u_int8_t A)
         {
             alarm(link->timeout);
             OPTIONS_TPROP();
-            res = write(link->fd, frame.frame, link->frame.frameUsedSize);
+            res = FdWrite(link->fd, frame.frame, link->frame.frameUsedSize);
 
             if (res == -1)
             {

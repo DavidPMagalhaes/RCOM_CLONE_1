@@ -15,6 +15,8 @@ struct PHYSICAL_OPTIONS
     int OPTION_FER_DATA;
     int OPTION_TPROP;
     int OPTION_TPROP_MS;
+    int OPTIONS_PACKET_LOSS;
+    int OPTIONS_PACKET_LOSS_ODD;
 };
 
 void CREATE_OPTIONS(int argc, char **argv, time_t seed);
@@ -26,5 +28,7 @@ void OPTIONS_GENERATE_FER(struct linkLayer *link, readInformationState *state, u
 int OPTIONS_ALARM();
 
 void OPTIONS_TPROP();
+
+int OPTIONS_PACKET_LOSS();
 
 #endif

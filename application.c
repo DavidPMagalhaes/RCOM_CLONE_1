@@ -14,6 +14,9 @@
 #include "commandMessages.h" //printFrame
 #include "options.h"
 
+
+// TODO
+// Do I not clean dinammically allocated memory on an exit(1)? Should I
 int main(int argc, char **argv)
 {
     int res;
@@ -187,23 +190,6 @@ void writeInformationFrames(int fd, u_int8_t *buf, ssize_t size)
     }
     printf("No print %d", i);
 
-    // while (size > 0)
-    // {
-    //     // Is this comparison dangerous because of the types?
-    //     // https://stackoverflow.com/a/6636818 Should be fine: u_int16_t is converted to ssize_t
-    //     if (size < datasize)
-    //     {
-    //         packetSize = size;
-    //     }
-    //     else
-    //     {
-    //         packetSize = datasize;
-    //     }
-
-    //     // Index is mod 255 or 256. Should be 256 since that would only go up to 255 in a byte
-    //     packetSeq = (packetSeq + 1) % 256;
-    //     size -= packetSize;
-    // }
 }
 
 void assembleControlFrame(u_int8_t **buf, int *size, ssize_t fileSize, char *filename)
@@ -440,6 +426,12 @@ int readControlFrame(u_int8_t *buf, char **filename, ssize_t *filesize)
 
 void readInformationFrame(u_int8_t *buf, ssize_t *bufIndex, u_int8_t *frameBuf, u_int8_t *seq)
 {
+    // TODO teacher
+    // What happens if the frameBuf size is actualy smaller than the datasize that is indicating
+    // First, I am not checking for this issue. Would need to pass res from the caller function. 
+    // There wont be a problem with buffer size though
+    // We are also assuming datasize won't be corrupted and , therefore, won't read past the fixed frameBuf size
+
     // Byte 0 is already verified to be 1
     // How to deal with wrong sequence numbers?
     // Do I need to put them in the right place and the lowest received till now is my bufIndex?

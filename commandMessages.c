@@ -23,6 +23,7 @@ void printFrame(u_int8_t *buf, int bufLen)
 void commandMessage(u_int8_t buf[], u_int8_t A, u_int8_t C)
 {
     snprintf(buf, 6, "%c%c%c%c%c", F, A, C, A ^ C, F); // does this put the end of line character in the buffer too?
+    // Might be ugly using snprintf for bytes. Another solution TODO teacher?
 }
 
 void SETMessage(u_int8_t buf[])

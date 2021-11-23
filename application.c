@@ -16,7 +16,17 @@
 
 
 // TODO
+
+// 1
 // Do I not clean dinammically allocated memory on an exit(1)? Should I
+
+// 2
+// The receiver part of the application cannot complain if something higher level is wrong. Is that supposed to be the way?
+
+// 3
+// Adding options to change the frame size of the link layer and respective functions so that the application behaves according to that
+// Always trying to send the maximum information necessary
+
 int main(int argc, char **argv)
 {
     int res;

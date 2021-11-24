@@ -32,7 +32,7 @@ void writeLinkResponse(struct linkLayer *link)
 {
     int res;
     struct frame frame = link->frame;
-    res = FdWrite(link->fd, frame.frame, frame.frameUsedSize);
+    res = FdWrite(link->fd, link->frame.frame, link->frame.frameUsedSize);
     if (res == -1)
     {
         printf("Fd writing error\n");
@@ -147,8 +147,12 @@ int writeLinkInformation(struct linkLayer *link, u_int8_t A)
             }
             else
             {
-                state = WI_START;
                 // Probably a delayed answer. We will just ignore
+                alarm(0);         // Cancel scheduled alarm
+                count = 0;        // Reset number of attempts
+                flag = 1;         // Flag to write again
+                state = WI_START; // Set the state to the start
+                continue;
             }
         }
         else if (state == WI_STOP_RR)
@@ -164,7 +168,11 @@ int writeLinkInformation(struct linkLayer *link, u_int8_t A)
                 // Duplicate or some other situation. Receiver is asking for resend
                 // Approach is to ignore, and timeout will take care of it.
                 // Alternatively, we could do the same as when it is rejected with the current sequence number
-                state = WI_START;
+                alarm(0);         // Cancel scheduled alarm
+                count = 0;        // Reset number of attempts
+                flag = 1;         // Flag to write again
+                state = WI_START; // Set the state to the start
+                continue;
             }
         }
     }

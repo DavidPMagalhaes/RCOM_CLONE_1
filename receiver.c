@@ -19,19 +19,20 @@ int openReceiver(struct linkLayer *link)
 
 int readReceiver(struct linkLayer *link, u_int8_t *buffer)
 {
-    int res, Nr;
+    int res, Nr, A = A_EM;
     int disconnecting = 0;
     while (1)
     {
         link->frame.frameUsedSize = 0;
-        res = readLinkInformation(link, buffer, A_EM, &Nr);
+        res = readLinkInformation(link, buffer, A, &Nr);
+        A = A_EM; // In case after a disc message I happen receiving something that isn't a disc (UA failed for example)
         if (res == -1)
         {
             // Received message to disconnect
-            DISCMessage(link->frame.frame, A_EM);
+            DISCMessage(link->frame.frame, A_REC);
             link->frame.frameUsedSize = CMDSZ;
             writeLinkResponse(link);
-
+            A = A_REC;
             // Instead of returning to the loop after having written writeLinkResponse, I could do a writeLinkCommand and return on success
             disconnecting = 1;
             continue;

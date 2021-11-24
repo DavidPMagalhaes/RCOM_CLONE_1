@@ -38,13 +38,13 @@ int closeTransmitter(struct linkLayer *link)
     link->frame.frameUsedSize = CMDSZ;
     printFrame(link->frame.frame, link->frame.frameUsedSize);
 
-    if (writeLinkCommand(link, A_EM, DISC))
+    if (writeLinkCommand(link, A_REC, DISC))
     {
         //There was an error receiving disc
         return -1;
     }
 
-    UAMessage(link->frame.frame, A_EM);
+    UAMessage(link->frame.frame, A_REC);
     link->frame.frameUsedSize = CMDSZ;
     writeLinkResponse(link);
 

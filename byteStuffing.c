@@ -4,6 +4,9 @@
 #include <string.h>
 #include "commandMessages.h"
 
+// TODO Teacher
+// Stuffing and protection byte should be assembled seperately
+
 int stuff(struct frame *frame, u_int8_t tostuff[], int tostuffSize)
 {
     // Tostuff will not overflow the buffer

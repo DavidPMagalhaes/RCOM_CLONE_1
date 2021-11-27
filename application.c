@@ -14,20 +14,6 @@
 #include "commandMessages.h" //printFrame
 #include "options.h"
 
-
-// TODO
-
-// 1
-// Do I not clean dinammically allocated memory on an exit(1)? Should I
-
-// 2
-// The receiver part of the application cannot complain if something higher level is wrong. Is that supposed to be the way? 
-// Reject
-
-// 3
-// Adding options to change the frame size of the link layer and respective functions so that the application behaves according to that
-// Always trying to send the maximum information necessary
-
 int main(int argc, char **argv)
 {
     int res;
@@ -116,8 +102,7 @@ void startReceiverProtocol(int port)
         // Error
         exit(1);
     }
-    // TODO
-    // Add a prefix to the filename
+
     res = saveFile(filename, buf, size);
     if (res != 0)
     {
@@ -175,8 +160,8 @@ void writeFrames(int fd, u_int8_t *buf, ssize_t size, char *filename)
 
 void writeInformationFrames(int fd, u_int8_t *buf, ssize_t size)
 {
-    u_int8_t frameBuf[LINK_LAYER_BUFFER_SIZE];
-    u_int16_t datasize = LINK_LAYER_BUFFER_SIZE - INFORMATION_PACKET_HEAD_SIZE;
+    u_int8_t frameBuf[MAX_SIZE];
+    u_int16_t datasize = MAX_SIZE - INFORMATION_PACKET_HEAD_SIZE;
     u_int16_t packetDataSize;
     u_int8_t packetSeq = 0;
     ssize_t bufIndex = 0;
@@ -277,7 +262,7 @@ int saveFile(char *filename, u_int8_t *buf, ssize_t size)
     if (fd == -1)
     {
         // printf("%d", errno);
-        printf("Receiver: Unable to open output file\n");
+        printf("Receiver: Unable to open output file. Make sure file doesn't exist already\n");
     }
     free(filename2);
     res = write(fd, buf, size);
@@ -378,11 +363,6 @@ void readFrames(int fd, u_int8_t **buf, ssize_t *size, char **filename)
             }
             if (!expecting_end)
             {
-                // Too many safety measures?
-
-                // This might actually be a feasible scenario where the last information packet is delayed. What should I do in this case.
-                // We should have a windowBuf[256][255] to implement the sliding window mechanism perhaps
-                // Talk to the teacher TODO
                 printf("Receiver: Not expecting end packet\n");
                 exit(1);
             }
@@ -443,9 +423,6 @@ void readInformationFrame(u_int8_t *buf, ssize_t *bufIndex, u_int8_t *frameBuf, 
     // There wont be a problem with buffer size though
     // We are also assuming datasize won't be corrupted and , therefore, won't read past the fixed frameBuf size
 
-    // Byte 0 is already verified to be 1
-    // How to deal with wrong sequence numbers?
-    // Do I need to put them in the right place and the lowest received till now is my bufIndex?
     u_int8_t seqNo = frameBuf[1];
     u_int16_t datasize;
     memcpy(&datasize, frameBuf + 2, 2);
@@ -458,10 +435,7 @@ void readInformationFrame(u_int8_t *buf, ssize_t *bufIndex, u_int8_t *frameBuf, 
     }
     else
     {
-        // TODO
-        // See with the teacher what is the right approach here!!!
-        // Works as a sort of sliding window. Need to put the bytes in the right places
-        printf("Receiver: Incorrect data packet sequence order. Ask the developer to implement safety mechanisms\n");
+        printf("Receiver: Incorrect data packet sequence order.\n");
         exit(1);
     }
     return;

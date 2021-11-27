@@ -4,7 +4,11 @@
 #include <termios.h>
 #include "dataProtocol.h"
 
+// #define BAUDRATE B4800
+// #define BAUDRATE B9600
+// #define BAUDRATE B19200
 #define BAUDRATE B38400
+// #define BAUDRATE B57600
 #define _POSIX_SOURCE 1 /* POSIX compliant source */
 #define FALSE 0
 #define TRUE 1

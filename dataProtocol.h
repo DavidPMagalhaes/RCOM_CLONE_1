@@ -4,6 +4,10 @@
 #include <sys/types.h>
 
 #define MAX_SIZE 255
+// #define MAX_SIZE 128
+// #define MAX_SIZE 64
+// #define MAX_SIZE 512
+// #define MAX_SIZE 1024
 #define MAX_BUFFER_SIZE MAX_SIZE * 2 + 5 + 2
 
 typedef enum
@@ -24,7 +28,6 @@ struct linkLayer
 {
     char port[20]; /*Dispositivo /dev/ttySx, x = 0, 1*/
     int fd;
-    // TODO Teacher We are not setting baudRate in any way
     int baudRate;                  /*Velocidade de transmissão*/
     unsigned int sequenceNumber;   /*Número de sequência da trama: 0, 1*/
     unsigned int timeout;          /*Valor do temporizador: 1 s*/

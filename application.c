@@ -184,7 +184,6 @@ void writeInformationFrames(int fd, u_int8_t *buf, ssize_t size)
         bufIndex += packetDataSize;
         i++;
     }
-    printf("No print %d", i);
 
 }
 

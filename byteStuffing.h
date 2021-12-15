@@ -12,7 +12,7 @@
 
 //Stuffing and destuffing already take care of the protection byte
 
-int stuff(struct frame *frame, u_int8_t tostuff[], int tostuffSize); //,u_int8_t protectionByte); ??
+int stuff(struct frame *frame, u_int8_t tostuff[], int tostuffSize,u_int8_t protectionByte);
 
 int destuff(struct frame *frame, u_int8_t *buffer);
 // int destuff(struct frame *frame, u_int8_t *buffer, int bufferCapacity, int *bufferLength);

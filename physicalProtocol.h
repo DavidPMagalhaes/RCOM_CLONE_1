@@ -55,7 +55,7 @@ int writeLinkInformation(struct linkLayer *link, u_int8_t A);
 
 int readLinkCommand(struct linkLayer *link, u_int8_t A, u_int8_t C);
 
-int readLinkInformation(struct linkLayer *link, u_int8_t *buffer, u_int8_t A, int *Nr);
+int readLinkInformation(struct linkLayer *link, u_int8_t A, int *Nr);
 
 int commandStateMachine(commandState state, u_int8_t A, u_int8_t C, u_int8_t byte);
 

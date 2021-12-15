@@ -54,6 +54,7 @@ int writeLinkCommand(struct linkLayer *link, u_int8_t A, u_int8_t C)
     {
         if (flag)
         {
+            flag = 0;
             alarm(link->timeout);
             OPTIONS_TPROP();
             res = FdWrite(link->fd, frame.frame, link->frame.frameUsedSize);
@@ -63,7 +64,6 @@ int writeLinkCommand(struct linkLayer *link, u_int8_t A, u_int8_t C)
                 printf("Fd writing error\n");
                 exit(1);
             }
-            flag = 0;
         }
 
         res = read(link->fd, &byte, 1);
@@ -106,6 +106,7 @@ int writeLinkInformation(struct linkLayer *link, u_int8_t A)
             alarm(link->timeout);
             OPTIONS_TPROP();
             res = FdWrite(link->fd, frame.frame, link->frame.frameUsedSize);
+            // printf("Sending %d\n", link->sequenceNumber);
 
             if (res == -1)
             {
@@ -129,6 +130,7 @@ int writeLinkInformation(struct linkLayer *link, u_int8_t A)
         state = writeInformationStateMachine(state, A, byte, &Nr);
         if (state == WI_STOP_REJ)
         {
+            // printf("Rejection of %d resending with %d\n", Nr, link->sequenceNumber);
             if (Nr == link->sequenceNumber) //Information referring to this frame
             {
                 // We will need to retransmit
@@ -157,6 +159,7 @@ int writeLinkInformation(struct linkLayer *link, u_int8_t A)
         }
         else if (state == WI_STOP_RR)
         {
+            // printf("Received RR of %d, sent %d\n", Nr, link->sequenceNumber);
             if (Nr != link->sequenceNumber) //Is asking for the next frame. All ok
             {
                 //Received message successful
@@ -207,7 +210,7 @@ int readLinkCommand(struct linkLayer *link, u_int8_t A, u_int8_t C)
     }
 }
 
-int readLinkInformation(struct linkLayer *link, u_int8_t *buffer, u_int8_t A, int *Nr)
+int readLinkInformation(struct linkLayer *link, u_int8_t A, int *Nr)
 {
     int res;
     struct frame frame = link->frame;
@@ -241,7 +244,7 @@ int readLinkInformation(struct linkLayer *link, u_int8_t *buffer, u_int8_t A, in
 
         if (state == RI_INFORMATION_STOP)
         {
-
+            // printf("Received %d Wanting %d\n", *Nr, link->sequenceNumber);
             if ((*Nr) == link->sequenceNumber)
             {
                 // Correct one
@@ -274,7 +277,7 @@ int readLinkInformation(struct linkLayer *link, u_int8_t *buffer, u_int8_t A, in
 
 int commandStateMachine(commandState state, u_int8_t A, u_int8_t C, u_int8_t byte)
 {
-    static int protectionByte = 0;
+    static u_int8_t protectionByte = 0;
     switch (state)
     {
     case START:
@@ -292,6 +295,7 @@ int commandStateMachine(commandState state, u_int8_t A, u_int8_t C, u_int8_t byt
         }
         if (byte == F)
         {
+            protectionByte = 0;
             return FLAG_RCV;
         }
         return START;
@@ -303,6 +307,7 @@ int commandStateMachine(commandState state, u_int8_t A, u_int8_t C, u_int8_t byt
         }
         if (byte == F)
         {
+            protectionByte = 0;
             return FLAG_RCV;
         }
         return START;
@@ -314,6 +319,7 @@ int commandStateMachine(commandState state, u_int8_t A, u_int8_t C, u_int8_t byt
         }
         if (byte == F)
         {
+            protectionByte = 0;
             return FLAG_RCV;
         }
         // If not should I jump to a BCC_NOT_OK instead?
@@ -350,6 +356,7 @@ int writeInformationStateMachine(writeInformationState state, u_int8_t A, u_int8
         }
         if (byte == F)
         {
+            protectionByte = 0;
             return WI_FLAG_RCV;
         }
         return WI_START;
@@ -367,6 +374,7 @@ int writeInformationStateMachine(writeInformationState state, u_int8_t A, u_int8
         }
         if (byte == F)
         {
+            protectionByte = 0;
             return WI_FLAG_RCV;
         }
         return WI_START;
@@ -378,6 +386,7 @@ int writeInformationStateMachine(writeInformationState state, u_int8_t A, u_int8
         }
         if (byte == F)
         {
+            protectionByte = 0;
             return WI_FLAG_RCV;
         }
         return WI_START;
@@ -389,6 +398,7 @@ int writeInformationStateMachine(writeInformationState state, u_int8_t A, u_int8
         }
         if (byte == F)
         {
+            protectionByte = 0;
             return WI_FLAG_RCV;
         }
         return WI_START;
@@ -430,6 +440,7 @@ int readInformationStateMachine(readInformationState state, u_int8_t A, u_int8_t
         }
         if (byte == F)
         {
+            protectionByte = 0;
             return RI_FLAG_RCV;
         }
         return RI_RESET;
@@ -451,6 +462,7 @@ int readInformationStateMachine(readInformationState state, u_int8_t A, u_int8_t
         }
         if (byte == F)
         {
+            protectionByte = 0;
             return RI_FLAG_RCV;
         }
         return RI_RESET;
@@ -462,6 +474,7 @@ int readInformationStateMachine(readInformationState state, u_int8_t A, u_int8_t
         }
         if (byte == F)
         {
+            protectionByte = 0;
             return RI_FLAG_RCV;
         }
         return RI_RESET;
@@ -473,6 +486,7 @@ int readInformationStateMachine(readInformationState state, u_int8_t A, u_int8_t
         }
         if (byte == F)
         {
+            protectionByte = 0;
             return RI_FLAG_RCV;
         }
         return RI_RESET;
@@ -484,6 +498,7 @@ int readInformationStateMachine(readInformationState state, u_int8_t A, u_int8_t
         }
         if (byte == F)
         {
+            protectionByte = 0;
             return RI_FLAG_RCV;
         }
         return RI_RESET;

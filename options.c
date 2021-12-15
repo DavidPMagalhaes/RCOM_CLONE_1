@@ -114,6 +114,7 @@ int OPTION_IS_FLAG(char *arg)
 void OPTIONS_GENERATE_FER(struct linkLayer *link, readInformationState *state, u_int8_t A, int *Nr)
 {
     int r;
+    int mod = 0;
     u_int8_t byte;
 
     if (!OPTIONS.OPTION_FER)
@@ -140,10 +141,14 @@ void OPTIONS_GENERATE_FER(struct linkLayer *link, readInformationState *state, u
                 // 1 in a OPTIONS_FER_DATA chance of being a 0
                 // We will totally switch the byte.
                 link->frame.frame[i] = link->frame.frame[i] ^ 0xff;
+                mod = 1;
             }
         }
     }
-
+    if (link->frame.frame[5] == 0xf4)
+    {
+        printf("Error\n");
+    }
     // Errors for data
     if (OPTIONS.OPTION_FER_DATA != 0)
     {
@@ -169,6 +174,11 @@ void OPTIONS_GENERATE_FER(struct linkLayer *link, readInformationState *state, u
         (*state) = readInformationStateMachine(*state, A, byte, Nr);
         if (*state == RI_INFORMATION_STOP)
         {
+            if(mod){
+                printf("Modified but reached end\n");
+            }
+            printf("i is %d, frame size is %d\n", i, link->frame.frameUsedSize);
+
             return;
         }
         if (*state == RI_RESET)

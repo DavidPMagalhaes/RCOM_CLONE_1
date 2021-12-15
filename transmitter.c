@@ -3,6 +3,7 @@
 #include "commandMessages.h"
 #include "physicalProtocol.h"
 #include "byteStuffing.h"
+#include "dataProtection.h"
 
 int openTransmitter(struct linkLayer *link)
 {
@@ -16,8 +17,10 @@ int openTransmitter(struct linkLayer *link)
 int writeTransmitter(struct linkLayer *link, u_int8_t *buffer, int length)
 {
     int res;
+    u_int8_t protectionByte;
     IMessage(link->frame.frame, link->sequenceNumber);
-    link->frame.frameUsedSize = stuff(&(link->frame), buffer, length);
+    protectionByte = createProtectionByte(buffer,length);
+    link->frame.frameUsedSize = stuff(&(link->frame), buffer, length, protectionByte);
     res = writeLinkInformation(link, A_EM);
     if (res == 0)
     {

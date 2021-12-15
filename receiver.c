@@ -1,8 +1,10 @@
 #include "receiver.h"
 
+#include <string.h>
 #include "commandMessages.h"
 #include "physicalProtocol.h"
 #include "byteStuffing.h"
+#include "dataProtection.h"
 
 int openReceiver(struct linkLayer *link)
 {
@@ -20,11 +22,14 @@ int openReceiver(struct linkLayer *link)
 int readReceiver(struct linkLayer *link, u_int8_t *buffer)
 {
     int res, Nr, A = A_EM;
+    int corrupted = 0, verifyBcc = 0;
+    u_int8_t bufferWithBcc[MAX_SIZE + 1];
     int disconnecting = 0;
     while (1)
     {
+        corrupted = 0;
         link->frame.frameUsedSize = 0;
-        res = readLinkInformation(link, buffer, A, &Nr);
+        res = readLinkInformation(link, A, &Nr);
         A = A_EM; // In case after a disc message I happen receiving something that isn't a disc (UA failed for example)
         if (res == -1)
         {
@@ -39,6 +44,7 @@ int readReceiver(struct linkLayer *link, u_int8_t *buffer)
         }
         if (res == -2)
         {
+            // printf("Received duplicate Wanting %d\n", link->sequenceNumber);
             // When res == -2 means that we received the same package twice
             // Let's ask for the one we are waiting for, which should be the current sequenceNumber
             RRMessage(link->frame.frame, link->sequenceNumber);
@@ -61,10 +67,38 @@ int readReceiver(struct linkLayer *link, u_int8_t *buffer)
                 continue;
             }
         }
-
         // Read successfully the correct package
-        res = destuff(&(link->frame), buffer);
+
+        // Destuff to a buffer with one extra space for the bcc character
+        res = destuff(&(link->frame), bufferWithBcc);
         if (res == -1)
+        {
+            // Wrong character found after escape character
+            corrupted = 1;
+        }
+        else
+        {
+            // Verify protectiong byte
+            verifyBcc = verifyProtectionByte(bufferWithBcc, res);
+            if (bufferWithBcc[1] == 0xf4)
+            {
+                printFrame(bufferWithBcc, res);
+                printf("Look at my bcc %d\n", verifyBcc);
+            }
+        }
+
+        if (!verifyBcc || corrupted)
+        {
+            // Was already corrupted or the bcc was wrong
+            corrupted = 1;
+        }
+        else
+        {
+            // Copy to the buffer we which to return
+            res -= 1;
+            memcpy(buffer, bufferWithBcc, res);
+        }
+        if (corrupted)
         {
             // There was corruption in the data
             if (Nr != link->sequenceNumber)

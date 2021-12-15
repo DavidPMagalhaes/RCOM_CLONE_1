@@ -165,7 +165,7 @@ void writeInformationFrames(int fd, u_int8_t *buf, ssize_t size)
     u_int16_t packetDataSize;
     u_int8_t packetSeq = 0;
     ssize_t bufIndex = 0;
-    int i = 0;
+    int i = 0, packetCount = 0;
     while (bufIndex < size)
     {
         if (bufIndex + datasize > size)
@@ -179,12 +179,13 @@ void writeInformationFrames(int fd, u_int8_t *buf, ssize_t size)
 
         assembleInformationFrame(buf, bufIndex, frameBuf, packetDataSize, packetSeq);
         writeFrame(fd, frameBuf, INFORMATION_PACKET_HEAD_SIZE + packetDataSize);
+        packetCount++;
         // Index is mod 255 or 256. Should be 256 since that would only go up to 255 in a byte
         packetSeq = (packetSeq + 1) % 256;
         bufIndex += packetDataSize;
         i++;
     }
-
+    printf("Packet count %d\n", packetCount);
 }
 
 void assembleControlFrame(u_int8_t **buf, int *size, ssize_t fileSize, char *filename)
@@ -219,6 +220,7 @@ void assembleInformationFrame(u_int8_t *buf, ssize_t bufIndex, u_int8_t *frameBu
 void writeFrame(int fd, u_int8_t *buf, int size)
 {
     // We assume size is enough to fit in the frame buffer
+    printFrame(buf, size);
     int res = llwrite(fd, buf, size);
     if (res == -1)
     {
@@ -282,11 +284,12 @@ void readFrames(int fd, u_int8_t **buf, ssize_t *size, char **filename)
     int controlPacketSize = 0;
     ssize_t bufIndex = 0;
     u_int8_t seq = 0;
+    int count = 0;
 
     while (1)
     {
         res = llread(fd, frameBuf);
-
+        printFrame(frameBuf, res);
         if (res == 0)
         {
             if (start && !end)
@@ -298,6 +301,8 @@ void readFrames(int fd, u_int8_t **buf, ssize_t *size, char **filename)
             else if (start && end)
             {
                 // Disconnect request successfully received
+
+                printf("Printed %d", count);
                 return;
             }
             else if (!start && !end)
@@ -312,7 +317,7 @@ void readFrames(int fd, u_int8_t **buf, ssize_t *size, char **filename)
                 exit(1);
             }
         }
-
+        count++;
         control = frameBuf[0];
         switch (control)
         {
@@ -418,7 +423,7 @@ void readInformationFrame(u_int8_t *buf, ssize_t *bufIndex, u_int8_t *frameBuf, 
 {
     // TODO teacher
     // What happens if the frameBuf size is actualy smaller than the datasize that is indicating
-    // First, I am not checking for this issue. Would need to pass res from the caller function. 
+    // First, I am not checking for this issue. Would need to pass res from the caller function.
     // There wont be a problem with buffer size though
     // We are also assuming datasize won't be corrupted and , therefore, won't read past the fixed frameBuf size
 

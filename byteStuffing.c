@@ -7,19 +7,18 @@
 // TODO Teacher
 // Stuffing and protection byte should be assembled seperately
 
-int stuff(struct frame *frame, u_int8_t tostuff[], int tostuffSize)
+int stuff(struct frame *frame, u_int8_t tostuff[], int tostuffSize, u_int8_t protectionByte)
 {
     // Tostuff will not overflow the buffer
 
     int sfCount = FIRST_DATA_INDEX; //stuffed count
     int nsfCount = 0;               //nonstuffed count
     int flagged = 0;
-    u_int8_t c, protectionByte = 0;
+    u_int8_t c;
 
     for (int i = 0; i < tostuffSize; i++)
     {
         c = tostuff[i];
-        protectionByte ^= c;
         if (c == ESCAPE)
         {
             frame->frame[sfCount] = ESCAPE;
@@ -73,21 +72,12 @@ int destuff(struct frame *frame, u_int8_t *buffer)
     //Previous functions should have checked the first protection byte
     //We will only check the second
 
-    // if (bufferCapacity == 0)
-    // {
-    //     allocBufferSpace(buffer, bufferCapacity, SPACE_ALLOC_SIZE);
-    // }
-
     int sfcount = FIRST_DATA_INDEX;
     int nsfCount = 0;
     u_int8_t c, protectionByte = 0;
 
     for (int i = FIRST_DATA_INDEX; frame->frame[i] != F; i++)
     {
-        // if (nsfCount == bufferCapacity)
-        // {
-        //     allocBufferSpace(buffer, bufferCapacity, SPACE_ALLOC_SIZE);
-        // }
         c = frame->frame[i];
         if (c == ESCAPE)
         {
@@ -96,12 +86,10 @@ int destuff(struct frame *frame, u_int8_t *buffer)
             if (c == ESCAPE_THE_FLAG)
             {
                 buffer[nsfCount] = F;
-                protectionByte ^= F;
             }
             else if (c == ESCAPE_THE_ESCAPE)
             {
                 buffer[nsfCount] = ESCAPE;
-                protectionByte ^= ESCAPE;
             }
             else
             { //After an escape character there must always be one of those two
@@ -111,17 +99,9 @@ int destuff(struct frame *frame, u_int8_t *buffer)
         else
         {
             buffer[nsfCount] = c;
-            protectionByte ^= c;
         }
         nsfCount++;
     }
 
-    if (protectionByte != 0) //Data was corrupted
-    {
-        return -1; //Error: Please resend
-    }
-    else // All good
-    {
-        return nsfCount - 1; //-1 because the protection byte that was also in the stuffed sequence doesn't belong to the data
-    }
+    return nsfCount;
 }

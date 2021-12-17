@@ -1,2 +1,0 @@
-When a queue starts accumulating because of duplicates, it cannot get rid of it.
-Will start resending the messages multiple time

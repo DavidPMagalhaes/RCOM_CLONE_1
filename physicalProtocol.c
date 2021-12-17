@@ -17,7 +17,7 @@ void atende() // atende alarme
     {
         printf("Alarme #%d\n", count);
         flag = 1;
-        count++;
+        // count++;
     }
 }
 
@@ -52,7 +52,7 @@ void writeLinkResponse(struct linkLayer *link)
 
 int writeLinkCommand(struct linkLayer *link, u_int8_t A, u_int8_t C)
 {
-    // printf("writing link command");
+    printf("writing link command");
     int res;
     struct frame frame = link->frame;
     u_int8_t byte;
@@ -100,7 +100,7 @@ int writeLinkCommand(struct linkLayer *link, u_int8_t A, u_int8_t C)
 
 int writeLinkInformation(struct linkLayer *link, u_int8_t A)
 {
-    // printf("writing link command");
+    printf("writing link command");
     int res, Nr = 0;
     struct frame frame = link->frame;
     u_int8_t byte;
@@ -113,17 +113,17 @@ int writeLinkInformation(struct linkLayer *link, u_int8_t A)
     {
         if (flag)
         {
+            flag = 0;
             alarm(link->timeout);
             OPTIONS_TPROP();
             res = FdWrite(link->fd, frame.frame, link->frame.frameUsedSize);
-            // printf("Sending %d\n", link->sequenceNumber);
+            printf("Sending %d\n", link->sequenceNumber);
 
             if (res == -1)
             {
                 printf("Fd writing error\n");
                 exit(1);
             }
-            flag = 0;
         }
 
         res = read(link->fd, &byte, 1);
@@ -140,7 +140,7 @@ int writeLinkInformation(struct linkLayer *link, u_int8_t A)
         state = writeInformationStateMachine(state, A, byte, &Nr);
         if (state == WI_STOP_REJ)
         {
-            // printf("Rejection of %d resending with %d\n", Nr, link->sequenceNumber);
+            printf("Rejection of %d resending with %d\n", Nr, link->sequenceNumber);
             if (Nr == link->sequenceNumber) //Information referring to this frame
             {
                 // We will need to retransmit
@@ -169,7 +169,7 @@ int writeLinkInformation(struct linkLayer *link, u_int8_t A)
         }
         else if (state == WI_STOP_RR)
         {
-            // printf("Received RR of %d, sent %d\n", Nr, link->sequenceNumber);
+            printf("Received RR of %d, sent %d\n", Nr, link->sequenceNumber);
             if (Nr != link->sequenceNumber) //Is asking for the next frame. All ok
             {
                 //Received message successful
@@ -269,7 +269,7 @@ int readLinkInformation(struct linkLayer *link, u_int8_t A, int *Nr)
 
         if (state == RI_INFORMATION_STOP)
         {
-            // printf("Received %d Wanting %d\n", *Nr, link->sequenceNumber);
+            printf("Received %d Wanting %d\n", *Nr, link->sequenceNumber);
             if ((*Nr) == link->sequenceNumber)
             {
                 // Correct one

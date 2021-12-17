@@ -29,13 +29,13 @@ void atendeDisc()
     }
 }
 
-int FdWrite(int fd, void *buf, size_t count)
+int FdWrite(int fd, void *buf, size_t size)
 {
     if (OPTIONS_PACKET_LOSS())
     {
-        return count; // Returns count because, as far as the transmitter knows, it was successful
+        return size; // Returns count because, as far as the transmitter knows, it was successful
     }
-    return write(fd, buf, count);
+    return write(fd, buf, size);
 }
 
 void writeLinkResponse(struct linkLayer *link)

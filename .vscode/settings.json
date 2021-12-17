@@ -3,7 +3,8 @@
         "stdio.h": "c",
         "options.h": "c",
         "dataprotocol.h": "c",
-        "transmitter.h": "c"
+        "transmitter.h": "c",
+        "bytestuffing.h": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }

@@ -173,8 +173,8 @@ void OPTIONS_GENERATE_FER(struct linkLayer *link, readInformationState *state, u
         }
         if (*state == RI_RESET)
         {
-            // Without this, stuff breaks. Better to have this
-            // It will still time out
+            // If reaches a reset means that the errors generated made it an unviable packet
+            // Transmitter will timeout
             return;
         }
     }

@@ -10,16 +10,8 @@
 
 #define SPACE_ALLOC_SIZE 20
 
-//Stuffing and destuffing already take care of the protection byte
-
 int stuff(struct frame *frame, u_int8_t tostuff[], int tostuffSize,u_int8_t protectionByte);
 
 int destuff(struct frame *frame, u_int8_t *buffer);
-// int destuff(struct frame *frame, u_int8_t *buffer, int bufferCapacity, int *bufferLength);
-
-
-void allocSpace(struct frame *frame, int space);
-
-int allocBufferSpace(u_int8_t *buffer, int prevSpace, int extraSpace);
 
 #endif //BYTESTUFFING_H

@@ -62,4 +62,5 @@ int commandStateMachine(commandState state, u_int8_t A, u_int8_t C, u_int8_t byt
 int writeInformationStateMachine(writeInformationState state, u_int8_t A, u_int8_t byte, int *Nr);
 
 int readInformationStateMachine(readInformationState state, u_int8_t A, u_int8_t byte, int *Nr);
-#endif
+
+#endif //PHYSICALPROTOCOL_H

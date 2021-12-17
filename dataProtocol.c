@@ -18,19 +18,19 @@ int llopen(int porta, linkType type)
     link.type = type;
     link.sequenceNumber = 0;
     link.timeout = 3;
-    link.numTransmissions =3;
+    link.numTransmissions = 3;
     switch (type)
     {
     case TRANSMITTER:
         if (openTransmitter(&link) == 0)
         {
-            return link.fd; //emissor.c
+            return link.fd;
         }
         break;
     case RECEIVER:
         if (openReceiver(&link) == 0)
         {
-            return link.fd; //recetor.c
+            return link.fd;
         }
         break;
     }
@@ -39,16 +39,18 @@ int llopen(int porta, linkType type)
 
 int llwrite(int fd, u_int8_t *buffer, int length)
 {
-    if(fd != link.fd){
-        // do something
+    if (fd != link.fd)
+    {
+        printf("Wrong fd\n");
     }
     return writeTransmitter(&link, buffer, length);
 }
 
 int llread(int fd, u_int8_t *buffer)
 {
-    if(fd != link.fd){
-        // do something
+    if (fd != link.fd)
+    {
+        printf("Wrong fd\n");
     }
     return readReceiver(&link, buffer);
 }
@@ -59,19 +61,11 @@ int llclose(int fd)
     switch (link.type)
     {
     case TRANSMITTER:
-    printf("closing transmitter\n");
         res = closeTransmitter(&link);
         break;
     case RECEIVER:
-        // We don't do anything and just close the fd
-        // res = closeReceiver(&link);
         break;
     }
-    // if (res != 0)
-    // {
-    //     //What to do if res != 0?
-    //     return res;
-    // }
     closeFD(fd, oldtio);
     return res;
 }

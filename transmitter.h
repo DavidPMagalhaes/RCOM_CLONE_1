@@ -9,4 +9,4 @@ int writeTransmitter(struct linkLayer *link, u_int8_t *buffer, int length);
 
 int closeTransmitter(struct linkLayer *link);
 
-#endif
+#endif //TRANSMITTER_H

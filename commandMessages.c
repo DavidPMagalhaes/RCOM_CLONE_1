@@ -22,7 +22,7 @@ void printFrame(u_int8_t *buf, int bufLen)
 
 void commandMessage(u_int8_t buf[], u_int8_t A, u_int8_t C)
 {
-    snprintf(buf, 6, "%c%c%c%c%c", F, A, C, A ^ C, F); // does this put the end of line character in the buffer too?
+    snprintf(buf, 6, "%c%c%c%c%c", F, A, C, A ^ C, F);
 }
 
 void SETMessage(u_int8_t buf[])
@@ -51,6 +51,6 @@ void REJMessage(u_int8_t buf[], int R)
 }
 
 void IMessage(u_int8_t buf[], int S){
-    u_int8_t C = S << 6; // Does this work?
+    u_int8_t C = S << 6;
     snprintf(buf, 5, "%c%c%c%c", F, A_EM, C, A_EM ^ C);
 }

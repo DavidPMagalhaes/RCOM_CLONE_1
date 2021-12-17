@@ -8,6 +8,6 @@ ports:
 run: receiver transmitter
 
 receiver:
-	./main.exe 1
+	./app.exe 10
 transmitter:
-	./main.exe 2
+	./app.exe 11 image.png

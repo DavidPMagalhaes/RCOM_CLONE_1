@@ -23,6 +23,7 @@ void CREATE_OPTIONS(int argc, char **argv, time_t seed);
 
 int OPTION_IS_FLAG(char *arg);
 
+// Error generation is done after receiving a correct information frame
 void OPTIONS_GENERATE_FER(struct linkLayer *link, readInformationState *state, u_int8_t A, int *Nr);
 
 int OPTIONS_ALARM();
@@ -31,4 +32,4 @@ void OPTIONS_TPROP();
 
 int OPTIONS_PACKET_LOSS();
 
-#endif
+#endif //OPTIONS_H

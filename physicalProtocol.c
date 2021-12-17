@@ -7,7 +7,9 @@
 #include "commandMessages.h"
 #include "options.h"
 
-int flag = 1, count = 0;
+int flag = 1;
+int count = 0;
+int flagDisc = 0;
 
 void atende() // atende alarme
 {
@@ -16,6 +18,14 @@ void atende() // atende alarme
         printf("Alarme #%d\n", count);
         flag = 1;
         count++;
+    }
+}
+
+void atendeDisc()
+{
+    if (OPTIONS_ALARM())
+    {
+        flagDisc = 1;
     }
 }
 
@@ -213,9 +223,24 @@ int readLinkInformation(struct linkLayer *link, u_int8_t *buffer, u_int8_t A, in
     struct frame frame = link->frame;
     u_int8_t byte;
     readInformationState state = RI_START;
+
+    if (A == A_REC)
+    {
+        flagDisc = 0;
+        // Has already received a disconnect. Let's make sure we get it
+        (void)signal(SIGALRM, atendeDisc); // instala  rotina que atende interrupcao
+        alarm(link->timeout);
+    }
     while (1)
     {
         res = read(link->fd, &byte, 1);
+
+        if (flagDisc)
+        {
+            flagDisc = 0;
+            alarm(0); // If there was an alarm for UA let's get rid of it
+            return -3;
+        }
         if (res == 0)
         {
             continue;

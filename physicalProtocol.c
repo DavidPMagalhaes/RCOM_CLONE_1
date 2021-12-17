@@ -15,7 +15,7 @@ void atende() // atende alarme
     {
         printf("Alarme #%d\n", count);
         flag = 1;
-        count++;
+        // count++; //DEBUG
     }
 }
 
@@ -433,7 +433,7 @@ int readInformationStateMachine(readInformationState state, u_int8_t A, u_int8_t
         }
         return RI_START;
     case RI_FLAG_RCV:
-        if (byte == A)
+        if (byte == A_REC || byte == A_EM)
         {
             protectionByte ^= byte;
             return RI_A_RCV;

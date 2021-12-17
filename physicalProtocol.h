@@ -45,7 +45,7 @@ typedef enum
 
 void atende();
 
-int FdWrite(int fd, void *buf, size_t count);
+int FdWrite(int fd, void *buf, size_t size);
 
 void writeLinkResponse(struct linkLayer *link);
 

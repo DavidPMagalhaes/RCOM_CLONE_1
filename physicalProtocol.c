@@ -375,6 +375,7 @@ int writeInformationStateMachine(writeInformationState state, u_int8_t A, u_int8
         }
         if (byte == F)
         {
+            protectionByte = 0;
             return WI_FLAG_RCV;
         }
         return WI_START;
@@ -392,6 +393,7 @@ int writeInformationStateMachine(writeInformationState state, u_int8_t A, u_int8
         }
         if (byte == F)
         {
+            protectionByte = 0;
             return WI_FLAG_RCV;
         }
         return WI_START;
@@ -403,6 +405,7 @@ int writeInformationStateMachine(writeInformationState state, u_int8_t A, u_int8
         }
         if (byte == F)
         {
+            protectionByte = 0;
             return WI_FLAG_RCV;
         }
         return WI_START;
@@ -414,6 +417,7 @@ int writeInformationStateMachine(writeInformationState state, u_int8_t A, u_int8
         }
         if (byte == F)
         {
+            protectionByte = 0;
             return WI_FLAG_RCV;
         }
         return WI_START;
@@ -455,6 +459,7 @@ int readInformationStateMachine(readInformationState state, u_int8_t A, u_int8_t
         }
         if (byte == F)
         {
+            protectionByte = 0;
             return RI_FLAG_RCV;
         }
         return RI_RESET;
@@ -476,6 +481,7 @@ int readInformationStateMachine(readInformationState state, u_int8_t A, u_int8_t
         }
         if (byte == F)
         {
+            protectionByte = 0;
             return RI_FLAG_RCV;
         }
         return RI_RESET;
@@ -487,6 +493,7 @@ int readInformationStateMachine(readInformationState state, u_int8_t A, u_int8_t
         }
         if (byte == F)
         {
+            protectionByte = 0;
             return RI_FLAG_RCV;
         }
         return RI_RESET;
@@ -498,6 +505,7 @@ int readInformationStateMachine(readInformationState state, u_int8_t A, u_int8_t
         }
         if (byte == F)
         {
+            protectionByte = 0;
             return RI_FLAG_RCV;
         }
         return RI_RESET;
@@ -509,6 +517,7 @@ int readInformationStateMachine(readInformationState state, u_int8_t A, u_int8_t
         }
         if (byte == F)
         {
+            protectionByte = 0;
             return RI_FLAG_RCV;
         }
         return RI_RESET;

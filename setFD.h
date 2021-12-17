@@ -4,6 +4,7 @@
 #include <termios.h>
 #include "dataProtocol.h"
 
+// Change according to Baudrate to be used
 // #define BAUDRATE B4800
 // #define BAUDRATE B9600
 // #define BAUDRATE B19200
@@ -17,4 +18,4 @@ int setFD(struct linkLayer *link, struct termios *oldtio, struct termios *newtio
 
 int closeFD(int fd, struct termios oldtio);
 
-#endif
+#endif //SETFD_H

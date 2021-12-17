@@ -10,7 +10,6 @@ int openTransmitter(struct linkLayer *link)
 
     SETMessage(link->frame.frame);
     link->frame.frameUsedSize = CMDSZ;
-    //The fact that I have to remember what to send here is annoying me. Perhaps make the commandMessages return a u_int8_t[2] and use that for the state machine accordingly?
     return writeLinkCommand(link, A_EM, UA);
 }
 
@@ -24,9 +23,8 @@ int writeTransmitter(struct linkLayer *link, u_int8_t *buffer, int length)
     res = writeLinkInformation(link, A_EM);
     if (res == 0)
     {
-        // Let's only change the sequence number if we were successful
-        link->sequenceNumber = (link->sequenceNumber + 1) % 2; // N = 2
-        return length;
+        link->sequenceNumber = (link->sequenceNumber + 1) % 2; // Changes the sequence number. N = 2
+        return length; // Return number of bytes transmitted
     }
     return -1;
 }
@@ -41,7 +39,7 @@ int closeTransmitter(struct linkLayer *link)
 
     if (writeLinkCommand(link, A_REC, DISC))
     {
-        //There was an error receiving disc
+        //Timeout receiving disc
         return -1;
     }
 
@@ -49,7 +47,5 @@ int closeTransmitter(struct linkLayer *link)
     link->frame.frameUsedSize = CMDSZ;
     writeLinkResponse(link);
 
-    //If res != 0, then the receiver didn't get the memo to close
-    //What should the program do now?
     return 0;
 }

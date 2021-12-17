@@ -30,7 +30,6 @@ int readReceiver(struct linkLayer *link, u_int8_t *buffer)
         corrupted = 0;
         link->frame.frameUsedSize = 0;
         res = readLinkInformation(link, A, &Nr);
-        A = A_EM; // In case after a disc message I happen receiving something that isn't a disc (UA failed for example)
         if (res == -1)
         {
             // Received message to disconnect
@@ -38,20 +37,15 @@ int readReceiver(struct linkLayer *link, u_int8_t *buffer)
             link->frame.frameUsedSize = CMDSZ;
             writeLinkResponse(link);
             A = A_REC;
-            // Instead of returning to the loop after having written writeLinkResponse, I could do a writeLinkCommand and return on success
             disconnecting = 1;
             continue;
         }
         if (res == -2)
         {
-            // printf("Received duplicate Wanting %d\n", link->sequenceNumber);
-            // When res == -2 means that we received the same package twice
-            // Let's ask for the one we are waiting for, which should be the current sequenceNumber
+            // Received duplicate package. Ask for current package
             RRMessage(link->frame.frame, link->sequenceNumber);
-            link->frame.frameUsedSize = CMDSZ; // Reset the size of the buffer
+            link->frame.frameUsedSize = CMDSZ;
             writeLinkResponse(link);
-
-            // Go back to reading
             continue;
         }
         if (res == -3)
@@ -67,8 +61,8 @@ int readReceiver(struct linkLayer *link, u_int8_t *buffer)
                 continue;
             }
         }
-        // Read successfully the correct package
 
+        // Read successfully the correct package
         // Destuff to a buffer with one extra space for the bcc character
         res = destuff(&(link->frame), bufferWithBcc);
         if (res == -1)
@@ -76,7 +70,7 @@ int readReceiver(struct linkLayer *link, u_int8_t *buffer)
             // Wrong character found after escape character
             corrupted = 1;
         }
-        else
+        else //Destuffing was ok
         {
             // Verify protection byte
             verifyBcc = verifyProtectionByte(bufferWithBcc, res);
@@ -87,10 +81,10 @@ int readReceiver(struct linkLayer *link, u_int8_t *buffer)
             // Was already corrupted or the bcc was wrong
             corrupted = 1;
         }
-        else
+        else // Protection byte was ok
         {
-            // Copy to the buffer we which to return
-            res -= 1; // Res included the protection byte. The message is one byte shorter
+            // Copy to the buffer return buffer
+            res -= 1; // Res included the protection byte. The message is in fact one byte shorter
             memcpy(buffer, bufferWithBcc, res);
         }
         if (corrupted)
@@ -99,16 +93,16 @@ int readReceiver(struct linkLayer *link, u_int8_t *buffer)
             if (Nr != link->sequenceNumber)
             {
                 // Corrupted but it was from a previous package.
-                // Ask for next package
+                // Ask for current package
                 RRMessage(link->frame.frame, link->sequenceNumber);
-                link->frame.frameUsedSize = CMDSZ; // Reset the size of the buffer
+                link->frame.frameUsedSize = CMDSZ;
                 writeLinkResponse(link);
             }
             else
             {
                 // The current package was corrupted
                 REJMessage(link->frame.frame, link->sequenceNumber);
-                link->frame.frameUsedSize = CMDSZ; // Reset the size of the buffer
+                link->frame.frameUsedSize = CMDSZ; 
                 writeLinkResponse(link);
             }
 
@@ -117,10 +111,10 @@ int readReceiver(struct linkLayer *link, u_int8_t *buffer)
         }
         else
         {
-            // Ask for next packages
+            // Ask for next package
             link->sequenceNumber = (link->sequenceNumber + 1) % 2;
             RRMessage(link->frame.frame, link->sequenceNumber);
-            link->frame.frameUsedSize = CMDSZ; // Reset the size of the buffer
+            link->frame.frameUsedSize = CMDSZ; 
             writeLinkResponse(link);
         }
         return res;

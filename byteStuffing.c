@@ -4,15 +4,10 @@
 #include <string.h>
 #include "commandMessages.h"
 
-// TODO Teacher
-// Stuffing and protection byte should be assembled seperately
-
 int stuff(struct frame *frame, u_int8_t tostuff[], int tostuffSize, u_int8_t protectionByte)
 {
-    // Tostuff will not overflow the buffer
-
     int sfCount = FIRST_DATA_INDEX; //stuffed count
-    int nsfCount = 0;               //nonstuffed count
+    int nsfCount = 0;               //nonStuffed count
     int flagged = 0;
     u_int8_t c;
 
@@ -38,7 +33,8 @@ int stuff(struct frame *frame, u_int8_t tostuff[], int tostuffSize, u_int8_t pro
         }
     }
 
-    if (protectionByte == F) //Special and rare case
+    // Testing the protection byte for a special character
+    if (protectionByte == F) 
     {
 
         frame->frame[sfCount] = ESCAPE;
@@ -69,11 +65,8 @@ int stuff(struct frame *frame, u_int8_t tostuff[], int tostuffSize, u_int8_t pro
 
 int destuff(struct frame *frame, u_int8_t *buffer)
 {
-    //Previous functions should have checked the first protection byte
-    //We will only check the second
-
-    int sfcount = FIRST_DATA_INDEX;
-    int nsfCount = 0;
+    int sfcount = FIRST_DATA_INDEX; //stuffed count
+    int nsfCount = 0; //nonStuffed count
     u_int8_t c, protectionByte = 0;
 
     for (int i = FIRST_DATA_INDEX; frame->frame[i] != F; i++)

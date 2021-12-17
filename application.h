@@ -3,7 +3,7 @@
 
 #include <sys/types.h>
 
-#define LINK_LAYER_BUFFER_SIZE 255
+#define LINK_LAYER_BUFFER_SIZE 255 //Needs to be the same as the MAX_SIZE in dataProtocol.h
 #define INFORMATION_PACKET_HEAD_SIZE 4
 #define NUM_CONTROL_PARAMS 2 // Filesize and filename
 
@@ -35,4 +35,4 @@ int readControlFrame(u_int8_t *buf, char **filename, ssize_t *filesize);
 
 void readInformationFrame(u_int8_t *buf, ssize_t *bufIndex, u_int8_t *frameBuf, u_int8_t *seq);
 
-#endif
+#endif //APPLICATION_H

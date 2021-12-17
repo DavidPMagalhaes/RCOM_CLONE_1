@@ -1,7 +1,0 @@
-maquina de estados
-stuffind / destuffing (dynamic mmeory)
-ll functions llwrite, llread, llclose, llopen (ja ten no emiossor)
-bbc para mensanges de informacao vs mensagens de comando
-mount buffer to send on llwrite
-
-//What if the bytestuffing finds a '\0' byte?

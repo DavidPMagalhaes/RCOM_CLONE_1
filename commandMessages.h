@@ -34,4 +34,5 @@ void RRMessage(u_int8_t buf[], int R);
 void REJMessage(u_int8_t buf[], int R);
 
 void IMessage (u_int8_t buf[], int S);
-#endif
+
+#endif //COMMANDMESSAGES_H

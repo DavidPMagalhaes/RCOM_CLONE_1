@@ -140,6 +140,7 @@ void OPTIONS_GENERATE_FER(struct linkLayer *link, readInformationState *state, u
                 // 1 in a OPTIONS_FER_DATA chance of being a 0
                 // We will totally switch the byte.
                 link->frame.frame[i] = link->frame.frame[i] ^ 0xff;
+                mod = 1;
             }
         }
     }

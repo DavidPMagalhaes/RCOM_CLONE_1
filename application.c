@@ -184,7 +184,6 @@ void writeInformationFrames(int fd, u_int8_t *buf, ssize_t size)
         bufIndex += packetDataSize;
         i++;
     }
-
 }
 
 void assembleControlFrame(u_int8_t **buf, int *size, ssize_t fileSize, char *filename)
@@ -286,7 +285,6 @@ void readFrames(int fd, u_int8_t **buf, ssize_t *size, char **filename)
     while (1)
     {
         res = llread(fd, frameBuf);
-
         if (res == 0)
         {
             if (start && !end)
@@ -312,7 +310,6 @@ void readFrames(int fd, u_int8_t **buf, ssize_t *size, char **filename)
                 exit(1);
             }
         }
-
         control = frameBuf[0];
         switch (control)
         {
@@ -418,7 +415,7 @@ void readInformationFrame(u_int8_t *buf, ssize_t *bufIndex, u_int8_t *frameBuf, 
 {
     // TODO teacher
     // What happens if the frameBuf size is actualy smaller than the datasize that is indicating
-    // First, I am not checking for this issue. Would need to pass res from the caller function. 
+    // First, I am not checking for this issue. Would need to pass res from the caller function.
     // There wont be a problem with buffer size though
     // We are also assuming datasize won't be corrupted and , therefore, won't read past the fixed frameBuf size
 

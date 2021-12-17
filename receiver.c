@@ -23,7 +23,7 @@ int readReceiver(struct linkLayer *link, u_int8_t *buffer)
 {
     int res, Nr, A = A_EM;
     int corrupted = 0, verifyBcc = 0;
-    u_int8_t bufferWithBcc[MAX_SIZE + 1];
+    u_int8_t bufferWithBcc[MAX_SIZE + 2];
     int disconnecting = 0;
     while (1)
     {

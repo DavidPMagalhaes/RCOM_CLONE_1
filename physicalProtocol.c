@@ -15,7 +15,7 @@ void atende() // atende alarme
     {
         printf("Alarme #%d\n", count);
         flag = 1;
-        // count++; //DEBUG
+        count++;
     }
 }
 

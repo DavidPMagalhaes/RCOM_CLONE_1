@@ -183,8 +183,10 @@ int writeLinkInformation(struct linkLayer *link, u_int8_t A)
                 // Alternatively, we could do the same as when it is rejected with the current sequence number
                 alarm(0);         // Cancel scheduled alarm
                 count = 0;        // Reset number of attempts
-                flag = 1;         // Flag to write again
                 state = WI_START; // Set the state to the start
+
+                // Taking this line prevents sending the same package multiple times because of delayed confirmation. The else still resets the timer
+                // flag = 0;         // Flag to write again
                 continue;
             }
         }
